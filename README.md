@@ -37,9 +37,9 @@ Here's how encoding works:
 
 1. A pseudo-random alphabet offset integer is chosen from the given input.
 1. Alphabet is re-shuffled using that offset.
-1. Two characters are reserved from that alphabet, named "prefix" and "partition" ("prefix" is always the first character of an ID; "partition" is the character that acts as a separator between junk numbers and real numbers).
+1. Two characters are reserved from that alphabet, named `prefix` and `partition` (`prefix` is always the first character of an ID; `partition` is the character that acts as a separator between junk numbers and real numbers).
 1. For each input number, the following happens:
-   1. Another character is reserved from the alphabet, named "separator".
+   1. Another character is reserved from the alphabet, named `separator`.
    1. The rest of the alphabet is used to encode the number into id.
    1. If this is not the last number in the input array, a separator is appended onto the id.
    1. The alphabet is shuffled.
@@ -48,7 +48,7 @@ Here's how encoding works:
    - That difference is taken from the chunk of the alphabet and decoded back into a number.
    - That number is prepended into the input array as a partition number & encoding restarts.
 1. If the generated ID is found to have a blocklist word within its string, the following happens:
-   - If this is the first time, a partition number is prepended to the input array & encoding restarts. However, in this case, a "partition" character is used to isolate the partition number, as opposed to the "separator" character.
+   - If this is the first time, a partition number is prepended to the input array & encoding restarts. However, in this case, a `partition` character is used to isolate the partition number, as opposed to the `separator` character.
    - If this is not the first time (meaning the partition number has also matched the blocklist), then the partition number is incremented & encoding restarts.
 
 Decoding is the same process but in reverse.
@@ -61,4 +61,4 @@ Decoding is the same process but in reverse.
 
 ## 🍻 License
 
-Every official Sqids library should be MIT-licensed.
+Every official Sqids library is MIT-licensed.

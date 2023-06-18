@@ -7,7 +7,7 @@ type SqidsOptions = {
 export const defaultOptions = {
 	// url-safe characters
 	alphabet: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890',
-	// `minLength` is the minimum length ids should be
+	// `minLength` is the minimum length IDs should be
 	minLength: 0,
 	// a list of words that should not appear anywhere in the IDs
 	blocklist: new Set<string>()
@@ -67,7 +67,7 @@ export default class Sqids {
 		// alphabet should not contain `prefix` or `partition` reserved characters
 		alphabet = alphabet.slice(2);
 
-		// final id will always have the `prefix` character at the beginning
+		// final ID will always have the `prefix` character at the beginning
 		const ret = [prefix];
 
 		// encode input array
@@ -155,7 +155,7 @@ export default class Sqids {
 		// alphabet has to be without reserved `prefix` & `partition` characters
 		alphabet = alphabet.slice(2);
 
-		// now it's safe to remove the prefix character from id, it's not needed anymore
+		// now it's safe to remove the prefix character from ID, it's not needed anymore
 		id = id.slice(1);
 
 		// decode
@@ -173,7 +173,7 @@ export default class Sqids {
 				const alphabetWithoutSeparator = alphabet.slice(0, -1);
 				ret.push(this.toNumber(chunks[0], alphabetWithoutSeparator));
 
-				// if this id has multiple numbers, shuffle the alphabet because that's what encoding function did
+				// if this ID has multiple numbers, shuffle the alphabet because that's what encoding function did
 				if (chunks.length > 1) {
 					alphabet = this.shuffle(alphabet);
 				}
@@ -183,7 +183,7 @@ export default class Sqids {
 			id = chunks.slice(1).join(separator);
 		}
 
-		// if original id contains a `partition` character, remove the first number (it's junk)
+		// if original ID contains a `partition` character, remove the first number (it's junk)
 		if (originalId.includes(partition)) {
 			ret = ret.slice(1);
 		}
