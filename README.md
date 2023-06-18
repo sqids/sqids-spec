@@ -1,5 +1,7 @@
 # [Sqids](https://sqids.org) Specification
 
+[![Github Actions](https://img.shields.io/github/actions/workflow/status/sqids/sqids/tests.yml?style=flat-square)](https://github.com/sqids/sqids/actions)
+
 This is the main repository for Sqids specification. It is meant to be the guide for future ports of different languages.
 
 TypeScript was chosen to act as pseudocode. Individual implementations should feel free to optimize as needed. All the unit tests should have matching results.
