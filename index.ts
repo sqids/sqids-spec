@@ -6,7 +6,7 @@ type SqidsOptions = {
 
 export const defaultOptions = {
 	// url-safe characters
-	alphabet: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890',
+	alphabet: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
 	// `minLength` is the minimum length IDs should be
 	minLength: 0,
 	// a list of words that should not appear anywhere in the IDs
@@ -31,7 +31,7 @@ export default class Sqids {
 	/**
 	 * Encodes an array of unsigned integers into an ID
 	 *
-	 * @param {Array.<number>} numbers Positive integers to encode into an ID
+	 * @param {array.<number>} numbers Positive integers to encode into an ID
 	 * @returns {string} Generated ID
 	 */
 	encode(numbers: number[]): string {
@@ -44,7 +44,7 @@ export default class Sqids {
 	/**
 	 * Internal function that encodes an array of unsigned integers into an ID
 	 *
-	 * @param {Array.<number>} numbers Positive integers to encode into an ID
+	 * @param {array.<number>} numbers Positive integers to encode into an ID
 	 * @param {boolean} partitioned If true, the first number is always a throwaway number (used either for blocklist or padding)
 	 * @returns {string} Generated ID
 	 */
@@ -52,7 +52,7 @@ export default class Sqids {
 		// get a semi-random offset from input numbers
 		const offset =
 			numbers.reduce((a, v, i) => {
-				return (v % this.alphabet.length) * (i + 1) + a;
+				return this.alphabet[v % this.alphabet.length].codePointAt(0) + i + a;
 			}, numbers.length) % this.alphabet.length;
 
 		// re-arrange alphabet so that second-half goes in front of the first-half
@@ -132,7 +132,7 @@ export default class Sqids {
 	 * Decodes an ID back into an array of unsigned integers
 	 *
 	 * @param {string} id Encoded ID
-	 * @returns {Array.<number>} Array of unsigned integers
+	 * @returns {array.<number>} Array of unsigned integers
 	 */
 	decode(id: string): number[] {
 		// @todo check that characters are in the alphabet
@@ -211,8 +211,8 @@ export default class Sqids {
 		const chars = alphabet.split('');
 
 		for (let i = 0, j = chars.length - 1; j > 0; i++, j--) {
-			const r = (i + chars[i].codePointAt(0) + chars[j].codePointAt(0) + j) % chars.length;
-			[chars[j], chars[r]] = [chars[r], chars[j]];
+			const r = (i * j + chars[i].codePointAt(0) + chars[j].codePointAt(0)) % chars.length;
+			[chars[i], chars[r]] = [chars[r], chars[i]];
 		}
 
 		return chars.join('');

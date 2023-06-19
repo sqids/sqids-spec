@@ -4,41 +4,67 @@ import Sqids, { defaultOptions } from './index.ts';
 test('incremental numbers', () => {
 	const sqids = new Sqids();
 
-	expect.soft(sqids.encode([0])).toBe('vn');
-	expect.soft(sqids.encode([1])).toBe('et');
-	expect.soft(sqids.encode([2])).toBe('ni');
-	expect.soft(sqids.encode([3])).toBe('g6');
-	expect.soft(sqids.encode([4])).toBe('tP');
+	const ids = {
+		bV: [0],
+		U9: [1],
+		g8: [2],
+		Ez: [3],
+		V8: [4],
+		ul: [5],
+		O3: [6],
+		AF: [7],
+		ph: [8],
+		n8: [9]
+	};
+
+	for (const [id, numbers] of Object.entries(ids)) {
+		expect.soft(sqids.encode(numbers)).toBe(id);
+		expect.soft(sqids.decode(id)).toEqual(numbers);
+	}
 });
 
-test('incremental numbers, same prefix', () => {
+test('incremental numbers, same index 0', () => {
 	const sqids = new Sqids();
 
-	expect.soft(sqids.encode([0, 0])).toBe('egvK');
-	expect.soft(sqids.encode([0, 1])).toBe('ghnJ');
-	expect.soft(sqids.encode([0, 2])).toBe('hjts');
-	expect.soft(sqids.encode([0, 3])).toBe('jCi1');
-	expect.soft(sqids.encode([0, 4])).toBe('Cm6u');
+	const ids = {
+		SrIu: [0, 0],
+		nZqE: [0, 1],
+		tJyf: [0, 2],
+		e86S: [0, 3],
+		rtC7: [0, 4],
+		sQ8R: [0, 5],
+		uz2n: [0, 6],
+		'7Td9': [0, 7],
+		'3nWE': [0, 8],
+		mIxM: [0, 9]
+	};
+
+	for (const [id, numbers] of Object.entries(ids)) {
+		expect.soft(sqids.encode(numbers)).toBe(id);
+		expect.soft(sqids.decode(id)).toEqual(numbers);
+	}
 });
 
-test('incremental numbers, same postfix', () => {
+test('incremental numbers, same index 1', () => {
 	const sqids = new Sqids();
 
-	expect.soft(sqids.encode([0, 0])).toBe('egvK');
-	expect.soft(sqids.encode([1, 0])).toBe('nhet');
-	expect.soft(sqids.encode([2, 0])).toBe('gjnh');
-	expect.soft(sqids.encode([3, 0])).toBe('tCgH');
-	expect.soft(sqids.encode([4, 0])).toBe('hmtj');
-});
+	const ids = {
+		SrIu: [0, 0],
+		nbqh: [1, 0],
+		t4yj: [2, 0],
+		eQ6L: [3, 0],
+		r4Cc: [4, 0],
+		sL82: [5, 0],
+		uo2f: [6, 0],
+		'7Zdq': [7, 0],
+		'36Wf': [8, 0],
+		m4xT: [9, 0]
+	};
 
-test('decoding', () => {
-	const sqids = new Sqids();
-
-	expect.soft(sqids.decode('egvK')).toEqual([0, 0]);
-	expect.soft(sqids.decode('ghnJ')).toEqual([0, 1]);
-	expect.soft(sqids.decode('hjts')).toEqual([0, 2]);
-	expect.soft(sqids.decode('jCi1')).toEqual([0, 3]);
-	expect.soft(sqids.decode('Cm6u')).toEqual([0, 4]);
+	for (const [id, numbers] of Object.entries(ids)) {
+		expect.soft(sqids.encode(numbers)).toBe(id);
+		expect.soft(sqids.decode(id)).toEqual(numbers);
+	}
 });
 
 test('minimum length', () => {
@@ -66,14 +92,14 @@ test('blocklist', () => {
 	const sqids = new Sqids({
 		...defaultOptions,
 		blocklist: new Set([
-			'syrjLE', // result of the 1st encoding
-			'zkleEBnG', // result of the 2nd encoding
-			'DkXJ5q' // result of the 3rd encoding is "lDkXJ5q5", but let's check substring
+			'8QRLaD', // result of the 1st encoding
+			'7T1cd0dL', // result of the 2nd encoding
+			'A8UeIe' // result of the 3rd encoding is "RA8UeIe7", but let's check substring
 		])
 	});
 
-	expect.soft(sqids.encode([1, 2, 3])).toBe('kQBclabQ');
-	expect.soft(sqids.decode('kQBclabQ')).toEqual([1, 2, 3]);
+	expect.soft(sqids.encode([1, 2, 3])).toBe('WM3Limhw');
+	expect.soft(sqids.decode('WM3Limhw')).toEqual([1, 2, 3]);
 });
 
 test('encoding/decoding', () => {

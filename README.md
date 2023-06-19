@@ -68,8 +68,8 @@ Decoding is the same process but in reverse.
 - [x] Basic encoding/decoding functionality
 - [x] Support for custom blocklist
 - [x] Support for padding with `minLength`
-- [ ] Improve the way `offset` is generated & how alphabet is shuffled right after during encoding
-- [ ] Include unit tests for the internal shuffle function (check if shuffle can be improved)
+- [x] Include unit tests for the internal shuffle function (check if shuffle can be improved)
+- [x] Improve the way `offset` is generated & how alphabet is shuffled right after during encoding
 - [ ] Finalize creation of the default blocklist that can be used throughout
 
 ## 🍻 License
