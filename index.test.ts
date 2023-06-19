@@ -35,15 +35,21 @@ test('decoding', () => {
 	const sqids = new Sqids();
 
 	expect.soft(sqids.decode('egvK')).toEqual([0, 0]);
-	expect.soft(sqids.decode('ntep')).toEqual([0, 1]);
-	expect.soft(sqids.decode('ghnO')).toEqual([0, 2]);
-	expect.soft(sqids.decode('tigD')).toEqual([0, 3]);
-	expect.soft(sqids.decode('hjtu')).toEqual([0, 4]);
+	expect.soft(sqids.decode('ghnJ')).toEqual([0, 1]);
+	expect.soft(sqids.decode('hjts')).toEqual([0, 2]);
+	expect.soft(sqids.decode('jCi1')).toEqual([0, 3]);
+	expect.soft(sqids.decode('Cm6u')).toEqual([0, 4]);
 });
 
 test('minimum length', () => {
 	for (const minLength of [1, 10, defaultOptions.alphabet.length]) {
-		for (const numbers of [[0], [1, 2, 3, 4, 5], [100, 200, 300], [1000000]]) {
+		for (const numbers of [
+			[0],
+			[1, 2, 3, 4, 5],
+			[100, 200, 300],
+			[1_000, 2_000, 3_000],
+			[1_000_000]
+		]) {
 			const sqids = new Sqids({
 				...defaultOptions,
 				minLength
@@ -82,4 +88,18 @@ test('encoding/decoding', () => {
 	];
 	const output = sqids.decode(sqids.encode(numbers));
 	expect.soft(numbers).toEqual(output);
+});
+
+test('uniques', () => {
+	const sqids = new Sqids();
+	const max = 1_000_000;
+	const set = new Set<string>();
+
+	for (let i = 0; i != max; i++) {
+		const id = sqids.encode([i]);
+		set.add(id);
+		expect.soft(sqids.decode(id)).toEqual([i]);
+	}
+
+	expect.soft(set.size).toBe(max);
 });
