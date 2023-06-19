@@ -24,7 +24,7 @@ npm run format
 npm run lint
 ```
 
-## 💪 Improvements (over Hashids)
+## 🚧 Improvements (over Hashids)
 
 1. The user is not required to provide randomized input anymore (there's still support for custom IDs).
 1. Better internal alphabet shuffling function.
@@ -63,7 +63,7 @@ Decoding is the same process but in reverse.
 - Internal shuffle function does not use random input. It consistently produces the same output.
 - The blocklist should be a list of unacceptable words. At this point it is empty in the specification. Ideally we'd maintain a repository of these words (or use an existing one), and the words would be embedded into the library (since the codebase does not import any 3rd party libs).
 
-## 🚧 Todos
+## ✅ Todos
 
 - [x] Basic encoding/decoding functionality
 - [x] Support for custom blocklist
