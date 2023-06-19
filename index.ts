@@ -51,8 +51,8 @@ export default class Sqids {
 	private encodeNumbers(numbers: number[], partitioned = false): string {
 		// get a semi-random offset from input numbers
 		const offset =
-			numbers.reduce((a, v) => {
-				return a + (v % this.alphabet.length);
+			numbers.reduce((a, v, i) => {
+				return (v % this.alphabet.length) * (i + 1) + a;
 			}, numbers.length) % this.alphabet.length;
 
 		// re-arrange alphabet so that second-half goes in front of the first-half

@@ -4,7 +4,7 @@
 
 This is the main repository for Sqids specification. It is meant to be the guide for future ports of different languages.
 
-TypeScript was chosen to act as pseudocode. Individual implementations should feel free to optimize as needed. All the unit tests should have matching results.
+The code is optimized for readability; individual implementations should optimize for performance as needed. All unit tests should have matching results.
 
 ## 👩‍💻 Get started
 
@@ -57,7 +57,7 @@ Decoding is the same process but in reverse.
 
 ## 📋 Notes
 
-- The reason "prefix" character is used is to randomize sequential inputs (eg: [0, 1], [0, 2], [0, 3]). Without the extra prefix character embedded into the ID, the output would start with the same characters.
+- The reason `prefix` character is used is to randomize sequential inputs (eg: [0, 1], [0, 2], [0, 3]). Without the extra prefix character embedded into the ID, the output would start with the same characters.
 - Internal shuffle function does not use random input. It consistently produces the same shuffle.
 - The blocklist should be a list of unacceptable words. At this point it is empty in the specification. Ideally we'd maintain a repository of these words (or use an existing one), and the words would be embedded into the library (since the codebase does not import any 3rd party libs).
 

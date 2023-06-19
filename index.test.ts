@@ -15,10 +15,10 @@ test('incremental numbers, same prefix', () => {
 	const sqids = new Sqids();
 
 	expect.soft(sqids.encode([0, 0])).toBe('egvK');
-	expect.soft(sqids.encode([0, 1])).toBe('ntep');
-	expect.soft(sqids.encode([0, 2])).toBe('ghnO');
-	expect.soft(sqids.encode([0, 3])).toBe('tigD');
-	expect.soft(sqids.encode([0, 4])).toBe('hjtu');
+	expect.soft(sqids.encode([0, 1])).toBe('ghnJ');
+	expect.soft(sqids.encode([0, 2])).toBe('hjts');
+	expect.soft(sqids.encode([0, 3])).toBe('jCi1');
+	expect.soft(sqids.encode([0, 4])).toBe('Cm6u');
 });
 
 test('incremental numbers, same postfix', () => {
@@ -60,14 +60,14 @@ test('blocklist', () => {
 	const sqids = new Sqids({
 		...defaultOptions,
 		blocklist: new Set([
-			'6mjmec', // result of the 1st encoding
-			'CmPV4gcD', // result of the 2nd encoding
-			'amhfrc' // result of the 3rd encoding is "Pamhfrcc", but let's check substring
+			'syrjLE', // result of the 1st encoding
+			'zkleEBnG', // result of the 2nd encoding
+			'DkXJ5q' // result of the 3rd encoding is "lDkXJ5q5", but let's check substring
 		])
 	});
 
-	expect.soft(sqids.encode([1, 2, 3])).toBe('mrqgjF6E');
-	expect.soft(sqids.decode('mrqgjF6E')).toEqual([1, 2, 3]);
+	expect.soft(sqids.encode([1, 2, 3])).toBe('kQBclabQ');
+	expect.soft(sqids.decode('kQBclabQ')).toEqual([1, 2, 3]);
 });
 
 test('encoding/decoding', () => {
