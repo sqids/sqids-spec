@@ -70,6 +70,9 @@ Decoding is the same process but in reverse.
 - [x] Support for padding with `minLength`
 - [x] Include unit tests for the internal shuffle function (check if shuffle can be improved)
 - [x] Improve the way `offset` is generated & how alphabet is shuffled right after during encoding
+- [ ] Add required checks so ports know what to check for
+- [ ] Define error throwing behavior (when/where/if)
+- [ ] Create a universal test suite to cover all kinds of scenarios
 - [ ] Finalize creation of the default blocklist that can be used throughout
 
 ## 🍻 License
