@@ -100,6 +100,10 @@ test('blocklist', () => {
 
 	expect.soft(sqids.encode([1, 2, 3])).toBe('WM3Limhw');
 	expect.soft(sqids.decode('WM3Limhw')).toEqual([1, 2, 3]);
+
+	expect.soft(sqids.decode('8QRLaD')).toEqual([1, 2, 3]);
+	expect.soft(sqids.decode('7T1cd0dL')).toEqual([1, 2, 3]);
+	expect.soft(sqids.decode('RA8UeIe7')).toEqual([1, 2, 3]);
 });
 
 test('encoding/decoding', () => {
