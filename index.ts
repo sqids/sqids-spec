@@ -189,11 +189,6 @@ export default class Sqids {
 			ret = ret.slice(1);
 		}
 
-		// if re-encoding does not produce the same result, ID is invalid
-		if (this.encode(ret) != originalId) {
-			ret = [];
-		}
-
 		return ret;
 	}
 
