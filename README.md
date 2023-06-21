@@ -62,6 +62,7 @@ Decoding is the same process but in reverse.
 - The reason `prefix` character is used is to randomize sequential inputs (eg: [0, 1], [0, 2], [0, 3]). Without the extra `prefix` character embedded into the ID, the output would start with the same characters.
 - Internal shuffle function does not use random input. It consistently produces the same output.
 - The blocklist should be a list of unacceptable words. At this point it is empty in the specification. Ideally we'd maintain a repository of these words (or use an existing one), and the words would be embedded into the library (since the codebase does not import any 3rd party libs).
+- If new words are introduced to the blocklist (or removed from the blocklist), the `encode()` function might produce new IDs, but the `decode()` function would still work for old/blocked IDs, plus new IDs. So, there's more than ID that can be produced for same numbers.
 
 ## ✅ Todos
 
