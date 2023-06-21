@@ -19,6 +19,7 @@ export default class Sqids {
 	blocklist: Set<string>;
 
 	constructor(options: SqidsOptions = defaultOptions) {
+		// @todo check that the alphabet has only unique characters
 		// @todo check minimum length of the alphabet
 		// @todo check that `minLength` >= 0 && `minLength` <= `alphabet.length`
 		// @todo exclude words from `blocklist` that contain characters not in the alphabet
