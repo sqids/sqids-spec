@@ -73,7 +73,7 @@ Decoding is the same process but in reverse.
 - [x] Start work on the [default blacklist](https://github.com/sqids/sqids-blacklist)
 - [ ] Add required checks under @todo's
 - [ ] Define error handling behavior
-- [ ] Create a universal test suite
+- [ ] Create a universal test suite (great examples [here](https://github.com/niieani/hashids.js/tree/master/src/tests)).
 - [ ] Add non-English words to the default blacklist
 
 ## 🍻 License
