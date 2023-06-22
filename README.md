@@ -15,7 +15,7 @@ npm install
 npm test
 ```
 
-The main Sqids library is in [./index.ts](index.ts), & implementation unit tests are in [./index.test.ts](index.test.ts).
+The main Sqids library is in [index.ts](index.ts), & implementation unit tests are in [tests/](tests/).
 
 Use the following to format & check changes:
 
