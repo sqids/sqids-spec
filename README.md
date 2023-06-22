@@ -71,6 +71,7 @@ Decoding is the same process but in reverse.
 - [x] Include unit tests for the internal shuffle function (check if shuffle can be improved)
 - [x] Improve the way `offset` is generated & how alphabet is shuffled right after during encoding
 - [x] Start work on the [default blacklist](https://github.com/sqids/sqids-blacklist)
+- [ ] Check if can add throwaway partition to the end (not the beginning); might avoid a few extra cycles
 - [ ] Add required checks under @todo's
 - [ ] Define error handling behavior
 - [ ] Create a universal test suite (great examples [here](https://github.com/niieani/hashids.js/tree/master/src/tests)).
