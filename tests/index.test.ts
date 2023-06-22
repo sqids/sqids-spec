@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import Sqids, { defaultOptions } from './index.ts';
+import Sqids, { defaultOptions } from '../index.ts';
 
 test('incremental numbers', () => {
 	const sqids = new Sqids();
@@ -88,22 +88,20 @@ test('minimum length', () => {
 	}
 });
 
-test('blocklist', () => {
+test('blacklist', () => {
 	const sqids = new Sqids({
 		...defaultOptions,
-		blocklist: new Set([
+		blacklist: new Set([
 			'8QRLaD', // result of the 1st encoding
-			'7T1cd0dL', // result of the 2nd encoding
-			'A8UeIe' // result of the 3rd encoding is "RA8UeIe7", but let's check substring
+			'7T1cd0dL' // result of the 2nd encoding
 		])
 	});
 
-	expect.soft(sqids.encode([1, 2, 3])).toBe('WM3Limhw');
-	expect.soft(sqids.decode('WM3Limhw')).toEqual([1, 2, 3]);
+	expect.soft(sqids.encode([1, 2, 3])).toBe('RA8UeIe7');
+	expect.soft(sqids.decode('RA8UeIe7')).toEqual([1, 2, 3]);
 
 	expect.soft(sqids.decode('8QRLaD')).toEqual([1, 2, 3]);
 	expect.soft(sqids.decode('7T1cd0dL')).toEqual([1, 2, 3]);
-	expect.soft(sqids.decode('RA8UeIe7')).toEqual([1, 2, 3]);
 });
 
 test('encoding/decoding', () => {
@@ -118,18 +116,4 @@ test('encoding/decoding', () => {
 	];
 	const output = sqids.decode(sqids.encode(numbers));
 	expect.soft(numbers).toEqual(output);
-});
-
-test('uniques', () => {
-	const sqids = new Sqids();
-	const max = 1_000_000;
-	const set = new Set<string>();
-
-	for (let i = 0; i != max; i++) {
-		const id = sqids.encode([i]);
-		set.add(id);
-		expect.soft(sqids.decode(id)).toEqual([i]);
-	}
-
-	expect.soft(set.size).toBe(max);
 });

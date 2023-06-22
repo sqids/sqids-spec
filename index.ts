@@ -1,7 +1,9 @@
+import blacklist from './blacklist.json';
+
 type SqidsOptions = {
 	alphabet: string;
 	minLength: number;
-	blocklist: Set<string>;
+	blacklist: Set<string>;
 };
 
 export const defaultOptions = {
@@ -10,23 +12,23 @@ export const defaultOptions = {
 	// `minLength` is the minimum length IDs should be
 	minLength: 0,
 	// a list of words that should not appear anywhere in the IDs
-	blocklist: new Set<string>()
+	blacklist: new Set<string>(blacklist)
 };
 
 export default class Sqids {
 	alphabet: string;
 	minLength: number;
-	blocklist: Set<string>;
+	blacklist: Set<string>;
 
 	constructor(options: SqidsOptions = defaultOptions) {
 		// @todo check that the alphabet has only unique characters
 		// @todo check minimum length of the alphabet
 		// @todo check that `minLength` >= 0 && `minLength` <= `alphabet.length`
-		// @todo exclude words from `blocklist` that contain characters not in the alphabet
+		// @todo exclude words from `blacklist` that contain characters not in the alphabet
 
 		this.alphabet = this.shuffle(options.alphabet ?? defaultOptions.alphabet);
 		this.minLength = options.minLength ?? defaultOptions.minLength;
-		this.blocklist = options.blocklist ?? defaultOptions.blocklist;
+		this.blacklist = options.blacklist ?? defaultOptions.blacklist;
 	}
 
 	/**
@@ -46,7 +48,7 @@ export default class Sqids {
 	 * Internal function that encodes an array of unsigned integers into an ID
 	 *
 	 * @param {array.<number>} numbers Positive integers to encode into an ID
-	 * @param {boolean} partitioned If true, the first number is always a throwaway number (used either for blocklist or padding)
+	 * @param {boolean} partitioned If true, the first number is always a throwaway number (used either for blacklist or padding)
 	 * @returns {string} Generated ID
 	 */
 	private encodeNumbers(numbers: number[], partitioned = false): string {
@@ -62,7 +64,7 @@ export default class Sqids {
 		// prefix is the first character in the generated ID, used for randomization
 		const prefix = alphabet.charAt(0);
 
-		// partition is the character used instead of the first separator to indicate that the first number in the input array is a throwaway number. this character is used only once to handle blocklist and/or padding
+		// partition is the character used instead of the first separator to indicate that the first number in the input array is a throwaway number. this character is used only once to handle blacklist and/or padding
 		const partition = alphabet.charAt(1);
 
 		// alphabet should not contain `prefix` or `partition` reserved characters
@@ -234,8 +236,20 @@ export default class Sqids {
 	}
 
 	private isBlockedId(id: string): boolean {
-		for (const word of this.blocklist) {
-			if (id.toLowerCase().includes(word.toLowerCase())) {
+		id = id.toLowerCase();
+
+		for (let word of this.blacklist) {
+			word = word.toLowerCase();
+
+			if (id.length <= 3 || word.length <= 3) {
+				if (id == word) {
+					return true;
+				}
+			} else if (/\d/.test(word)) {
+				if (id.startsWith(word)) {
+					return true;
+				}
+			} else if (id.includes(word)) {
 				return true;
 			}
 		}

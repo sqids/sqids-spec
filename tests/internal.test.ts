@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { defaultOptions } from './index.ts';
+import { defaultOptions } from '../index.ts';
 
 // `shuffle` should stay an internal function, so these are tests to experiment with randomness
 

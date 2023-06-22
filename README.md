@@ -29,7 +29,7 @@ npm run lint
 1. The user is not required to provide randomized input anymore (there's still support for custom IDs).
 1. Better internal alphabet shuffling function.
 1. With default alphabet - Hashids is using base 49 for encoding-only, whereas Sqids is using base 60.
-1. Safer public IDs, with support for custom word blocklist.
+1. Safer public IDs, with support for custom blacklist of words.
 1. Separators are no longer limited to characters "c, s, f, h, u, i, t". Instead, it's one rotating separator assigned on the fly.
 1. Simpler & smaller implementation: only "encode", "decode", "minValue", "maxValue" functions.
 
@@ -51,9 +51,9 @@ Here's how encoding works:
    - The difference in length is calculated.
    - That length is taken from the alphabet and decoded back into a number.
    - That number is prepended into the input array as a throwaway number & encoding restarts (this time partitioned).
-1. If the generated ID is found to have a blocklist word within:
+1. If the blacklist function matches the generated ID:
    - If this is the first time, a throwaway number is prepended to the input array & encoding restarts (this time partitioned). However, during encoding a `partition` character is used to isolate the throwaway number, as opposed to the `separator` character.
-   - If the throwaway number has also matched the blocklist, then the throwaway number is incremented & encoding restarts.
+   - If the throwaway number has also matched the blacklist, then the throwaway number is incremented & encoding restarts.
 
 Decoding is the same process but in reverse.
 
@@ -61,20 +61,19 @@ Decoding is the same process but in reverse.
 
 - The reason `prefix` character is used is to randomize sequential inputs (eg: [0, 1], [0, 2], [0, 3]). Without the extra `prefix` character embedded into the ID, the output would start with the same characters.
 - Internal shuffle function does not use random input. It consistently produces the same output.
-- The blocklist should be a list of unacceptable words. At this point it is empty in the specification. Ideally we'd maintain a repository of these words (or use an existing one), and the words would be embedded into the library (since the codebase does not import any 3rd party libs).
-- If new words are introduced to the blocklist (or removed from the blocklist), the `encode()` function might produce new IDs, but the `decode()` function would still work for old/blocked IDs, plus new IDs. So, there's more than ID that can be produced for same numbers.
+- If new words are blacklisted (or removed from the blacklist), the `encode()` function might produce new IDs, but the `decode()` function would still work for old/blocked IDs, plus new IDs. So, there's more than one ID that can be produced for same numbers.
 
 ## ✅ Todos
 
 - [x] Basic encoding/decoding functionality
-- [x] Support for custom blocklist
+- [x] Support for custom blacklist
 - [x] Support for padding with `minLength`
 - [x] Include unit tests for the internal shuffle function (check if shuffle can be improved)
 - [x] Improve the way `offset` is generated & how alphabet is shuffled right after during encoding
 - [ ] Add required checks so ports know what to check for
 - [ ] Define error handling behavior
 - [ ] Create a universal test suite to cover all kinds of scenarios
-- [ ] Finalize creation of the default blocklist that can be embedded into different ports
+- [ ] Finalize creation of the default blacklist that can be embedded into different ports
 
 ## 🍻 License
 
