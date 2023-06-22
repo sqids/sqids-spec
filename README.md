@@ -70,10 +70,11 @@ Decoding is the same process but in reverse.
 - [x] Support for padding with `minLength`
 - [x] Include unit tests for the internal shuffle function (check if shuffle can be improved)
 - [x] Improve the way `offset` is generated & how alphabet is shuffled right after during encoding
-- [ ] Add required checks so ports know what to check for
+- [x] Start work on the [default blacklist](https://github.com/sqids/sqids-blacklist)
+- [ ] Add required checks under @todo's
 - [ ] Define error handling behavior
-- [ ] Create a universal test suite to cover all kinds of scenarios
-- [ ] Finalize creation of the default blacklist that can be embedded into different ports
+- [ ] Create a universal test suite
+- [ ] Add non-English words to the default blacklist
 
 ## 🍻 License
 
