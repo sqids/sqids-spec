@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import Sqids, { defaultOptions } from '../index.ts';
+import Sqids, { defaultOptions } from '../src/index.ts';
 
 test('incremental numbers', () => {
 	const sqids = new Sqids();
@@ -116,4 +116,15 @@ test('encoding/decoding', () => {
 	];
 	const output = sqids.decode(sqids.encode(numbers));
 	expect.soft(numbers).toEqual(output);
+});
+
+test('short alphabet', () => {
+	const sqids = new Sqids({
+		...defaultOptions,
+		alphabet: 'abcde',
+		minLength: 5
+	});
+
+	const numbers = [1, 2, 3000];
+	expect.soft(sqids.decode(sqids.encode(numbers))).toEqual(numbers);
 });

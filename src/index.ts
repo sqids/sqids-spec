@@ -21,25 +21,71 @@ export default class Sqids {
 	blacklist: Set<string>;
 
 	constructor(options: SqidsOptions = defaultOptions) {
-		// @todo check that the alphabet has only unique characters
-		// @todo check minimum length of the alphabet
-		// @todo check that `minLength` >= 0 && `minLength` <= `alphabet.length`
-		// @todo exclude words from `blacklist` that contain characters not in the alphabet
+		const alphabet = options.alphabet ?? defaultOptions.alphabet;
+		const minLength = options.minLength ?? defaultOptions.minLength;
+		const blacklist = new Set([...defaultOptions.blacklist, ...options.blacklist]);
 
-		this.alphabet = this.shuffle(options.alphabet ?? defaultOptions.alphabet);
-		this.minLength = options.minLength ?? defaultOptions.minLength;
-		this.blacklist = options.blacklist ?? defaultOptions.blacklist;
+		// check the length of the alphabet
+		if (alphabet.length < 5) {
+			throw new Error('Alphabet length must be at least 5');
+		}
+
+		// check that the alphabet has only unique characters
+		if (new Set(alphabet).size != alphabet.length) {
+			throw new Error('Alphabet must contain unique characters');
+		}
+
+		// test min length (type [might be lang-specific] + min length + max length)
+		if (
+			typeof minLength != 'number' ||
+			minLength < this.minValue() ||
+			minLength > alphabet.length
+		) {
+			throw new TypeError(
+				`Minimum length has to be between ${this.minValue()} and ${alphabet.length}`
+			);
+		}
+
+		// exclude words from `blacklist` that contain characters not in the alphabet
+		// there's no point in having them around since they'll never match
+		const filteredBlacklist = new Set<string>();
+		const alphabetChars = alphabet.split('');
+		for (const word of blacklist) {
+			const wordChars = word.split('');
+			const intersection = wordChars.filter((c) => alphabetChars.includes(c));
+			if (intersection.length == wordChars.length) {
+				filteredBlacklist.add(word);
+			}
+		}
+
+		this.alphabet = this.shuffle(alphabet);
+		this.minLength = minLength;
+		this.blacklist = filteredBlacklist;
 	}
 
 	/**
 	 * Encodes an array of unsigned integers into an ID
 	 *
+	 * These are the cases where encoding might fail:
+	 * - One of the numbers passed is smaller than `minValue()` or greater than `maxValue()`
+	 * - A partition number is incremented so much that it becomes greater than `maxValue()`
+	 *
 	 * @param {array.<number>} numbers Positive integers to encode into an ID
 	 * @returns {string} Generated ID
 	 */
 	encode(numbers: number[]): string {
-		// @todo check that no negative numbers
-		// @todo check that numbers are not greater than `this.maxValue()`
+		// if no numbers passed, return an empty string
+		if (numbers.length == 0) {
+			return '';
+		}
+
+		// don't allow out-of-range numbers [might be lang-specific]
+		const inRangeNumbers = numbers.filter((n) => n >= this.minValue() && n <= this.maxValue());
+		if (inRangeNumbers.length != numbers.length) {
+			throw new Error(
+				`Encoding supports numbers between ${this.minValue()} and ${this.maxValue()}`
+			);
+		}
 
 		return this.encodeNumbers(numbers, false);
 	}
@@ -120,7 +166,11 @@ export default class Sqids {
 		// if ID has a blocked word anywhere, add a throwaway number & start over
 		if (this.isBlockedId(id)) {
 			if (partitioned) {
-				numbers[0] += 1;
+				if (numbers[0] + 1 > this.maxValue()) {
+					throw new Error('Ran out of range checking against the blacklist');
+				} else {
+					numbers[0] += 1;
+				}
 			} else {
 				numbers = [0, ...numbers];
 			}
@@ -134,14 +184,30 @@ export default class Sqids {
 	/**
 	 * Decodes an ID back into an array of unsigned integers
 	 *
+	 * These are the cases where the return value might be an empty array:
+	 * - Empty ID / empty string
+	 * - Invalid ID passed (reserved character is in the wrong place)
+	 * - Non-alphabet character is found within ID
+	 *
 	 * @param {string} id Encoded ID
 	 * @returns {array.<number>} Array of unsigned integers
 	 */
 	decode(id: string): number[] {
-		// @todo check that characters are in the alphabet
-
 		let ret: number[] = [];
 		const originalId = id;
+
+		// if an empty string, return an empty array
+		if (id == '') {
+			return ret;
+		}
+
+		// if a character is not in the alphabet, return an empty array
+		const alphabetChars = this.alphabet.split('');
+		for (const c of id.split('')) {
+			if (!alphabetChars.includes(c)) {
+				return ret;
+			}
+		}
 
 		// first character is always the `prefix`
 		const prefix = id.charAt(0);

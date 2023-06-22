@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import Sqids from '../index.ts';
+import Sqids from '../src/index.ts';
 
 test('uniques', () => {
 	const sqids = new Sqids();
