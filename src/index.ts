@@ -48,13 +48,15 @@ export default class Sqids {
 
 		// exclude words from `blacklist` that contain characters not in the alphabet
 		// there's no point in having them around since they'll never match
+		//
+		// also every blacklisted word should be lowercase (the default list already is, but custom list might not be)
 		const filteredBlacklist = new Set<string>();
 		const alphabetChars = alphabet.split('');
 		for (const word of blacklist) {
 			const wordChars = word.split('');
 			const intersection = wordChars.filter((c) => alphabetChars.includes(c));
 			if (intersection.length == wordChars.length) {
-				filteredBlacklist.add(word);
+				filteredBlacklist.add(word.toLowerCase());
 			}
 		}
 
@@ -304,9 +306,7 @@ export default class Sqids {
 	private isBlockedId(id: string): boolean {
 		id = id.toLowerCase();
 
-		for (let word of this.blacklist) {
-			word = word.toLowerCase();
-
+		for (const word of this.blacklist) {
 			if (id.length <= 3 || word.length <= 3) {
 				if (id == word) {
 					return true;
