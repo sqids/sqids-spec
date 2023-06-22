@@ -308,14 +308,17 @@ export default class Sqids {
 
 		for (const word of this.blacklist) {
 			if (id.length <= 3 || word.length <= 3) {
+				// short words have to match completely; otherwise, too many matches
 				if (id == word) {
 					return true;
 				}
 			} else if (/\d/.test(word)) {
-				if (id.startsWith(word)) {
+				// words with leet speak replacements are visible mostly on the ends of the ID
+				if (id.startsWith(word) || id.endsWith(word)) {
 					return true;
 				}
 			} else if (id.includes(word)) {
+				// otherwise, check for blacklisted word anywhere in the string
 				return true;
 			}
 		}
