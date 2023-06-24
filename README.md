@@ -47,20 +47,20 @@ Here's how encoding works:
 1. For each input number:
    1. Another character is reserved from the alphabet, named `separator`.
    1. The rest of the alphabet is used to encode the number into an ID.
-   1. If this is not the last number in the input array, a separator is appended.
+   1. If this is not the last number in the input array, either a `partition` or a `separator` character is appended (depending on the index & whether the numbers are partitioned or not).
    1. The alphabet is shuffled.
 1. If the generated ID does not meet the `minLength` requirement:
    - If this is the first time, a throwaway number is prepended to the input array.
    - Number are encoded again to generate a new ID (this time partitioned).
-   - If the `minLength` requirement is still not met, a new ID is composed of in this way: the `prefix` character + a slice of the alphabet to make up the missing length + the rest of the ID without the `prefix` character.
+   - If the `minLength` requirement is still not met, a new ID is composed in this way: the `prefix` character + a slice of the alphabet to make up the missing length + the rest of the ID without the `prefix` character.
 1. If the blacklist function matches the generated ID:
-   - If this is the first time, a throwaway number is prepended to the input array & encoding restarts (this time partitioned). However, during encoding a `partition` character is used to isolate the throwaway number, as opposed to the `separator` character.
+   - If this is the first time, a throwaway number is prepended to the input array & encoding restarts (this time partitioned).
    - If the throwaway number has also matched the blacklist, then the throwaway number is incremented & encoding restarts.
 
 Decoding is the same process but in reverse, with a few exceptions:
 
 - Once the `partition` character is found, everything to the left of it gets thrown away.
-- There is of course nothing to do regarding checking the `blacklist` and `minLength` requirements.
+- There is nothing done regarding `blacklist` and `minLength` requirements, those are used for encoding.
 
 ## 📋 Notes
 
@@ -80,7 +80,7 @@ Decoding is the same process but in reverse, with a few exceptions:
 - [x] Add required checks under @todo's
 - [x] Define error handling behavior
 - [x] Add non-English words to the [default blacklist](https://github.com/sqids/sqids-blacklist)
-- [x] Create a universal test suite (great examples [here](https://github.com/niieani/hashids.js/tree/master/src/tests)).
+- [x] Univeral test suite with 100% code coverage.
 
 ## 🍻 License
 
