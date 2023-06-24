@@ -11,6 +11,7 @@ test('simple', () => {
 	const id = '75JILToVsGerOADWmHlY38xvbaNZKQ9wdFS0B6kcMEtnRpgizhjU42qT1cd0dL';
 
 	expect.soft(sqids.encode(numbers)).toBe(id);
+	expect.soft(sqids.decode(id)).toEqual(numbers);
 });
 
 test('min lengths', () => {

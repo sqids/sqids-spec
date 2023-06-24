@@ -4,8 +4,11 @@ import Sqids from '../src/index.ts';
 test('simple', () => {
 	const sqids = new Sqids();
 
-	expect.soft(sqids.encode([1, 2, 3])).toBe('8QRLaD');
-	expect.soft(sqids.decode('8QRLaD')).toEqual([1, 2, 3]);
+	const numbers = [1, 2, 3];
+	const id = '8QRLaD';
+
+	expect.soft(sqids.encode(numbers)).toBe(id);
+	expect.soft(sqids.decode(id)).toEqual(numbers);
 });
 
 test('different inputs', () => {

@@ -11,6 +11,7 @@ test('simple', () => {
 	const id = '4d9fd2';
 
 	expect.soft(sqids.encode(numbers)).toBe(id);
+	expect.soft(sqids.decode(id)).toEqual(numbers);
 });
 
 test('short alphabet', () => {
