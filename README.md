@@ -68,20 +68,6 @@ Decoding is the same process but in reverse, with a few exceptions:
 - Internal shuffle function does not use random input. It consistently produces the same output.
 - If new words are blacklisted (or removed from the blacklist), the `encode()` function might produce new IDs, but the `decode()` function would still work for old/blocked IDs, plus new IDs. So, there's more than one ID that can be produced for same numbers.
 
-## ✅ Todos
-
-- [x] Basic encoding/decoding functionality
-- [x] Support for custom blacklist
-- [x] Support for padding with `minLength`
-- [x] Include unit tests for the internal shuffle function (check if shuffle can be improved)
-- [x] Improve the way `offset` is generated & how alphabet is shuffled right after during encoding
-- [x] Start work on the [default blacklist](https://github.com/sqids/sqids-blacklist)
-- [x] Check if can add throwaway partition to the end (not the beginning); might avoid a few extra cycles
-- [x] Add required checks under @todo's
-- [x] Define error handling behavior
-- [x] Add non-English words to the [default blacklist](https://github.com/sqids/sqids-blacklist)
-- [x] Univeral test suite with 100% code coverage.
-
 ## 🍻 License
 
 Every official Sqids library is MIT-licensed.
