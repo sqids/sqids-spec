@@ -6,7 +6,9 @@
 
 This is the main repository for Sqids specification. It is meant to be the guide for future ports of different languages.
 
-The code is optimized for readability; individual implementations should optimize for performance as needed. All unit tests should have matching results.
+**The code is optimized for readability and clarity**; _individual implementations should optimize for performance as needed_.
+
+All unit tests should have matching results.
 
 ## 👩‍💻 Get started
 
@@ -35,12 +37,12 @@ npm run lint
 
 ## 🔬 How it works
 
-Sqids is basically a decimal to hexademical conversion, but with a few extra features. The alphabet is larger, it supports encoding several numbers into a single ID, and it makes sure generated IDs are URL-safe (no profanity).
+Sqids is basically a decimal to hexademical conversion, but with a few extra features. The alphabet is larger, it supports encoding several numbers into a single ID, and it makes sure generated IDs are URL-safe (no common profanity).
 
 Here's how encoding works:
 
 1. A pseudo-random alphabet offset integer is chosen from the given input.
-1. Alphabet is shuffled using that offset.
+1. Alphabet is split into two pieces using that offset and that parts are swapped.
 1. Two characters are reserved from that alphabet, named `prefix` and `partition` (`prefix` is always the first character of the generated ID; `partition` is the character that acts as a separator between throwaway number and real numbers).
 1. For each input number:
    1. Another character is reserved from the alphabet, named `separator`.
@@ -48,14 +50,17 @@ Here's how encoding works:
    1. If this is not the last number in the input array, a separator is appended.
    1. The alphabet is shuffled.
 1. If the generated ID does not meet the `minLength` requirement:
-   - The difference in length is calculated.
-   - That length is taken from the alphabet and decoded back into a number.
-   - That number is prepended into the input array as a throwaway number & encoding restarts (this time partitioned).
+   - If this is the first time, a throwaway number is prepended to the input array.
+   - Number are encoded again to generate a new ID (this time partitioned).
+   - If the `minLength` requirement is still not met, a new ID is composed of in this way: the `prefix` character + a slice of the alphabet to make up the missing length + the rest of the ID without the `prefix` character.
 1. If the blacklist function matches the generated ID:
    - If this is the first time, a throwaway number is prepended to the input array & encoding restarts (this time partitioned). However, during encoding a `partition` character is used to isolate the throwaway number, as opposed to the `separator` character.
    - If the throwaway number has also matched the blacklist, then the throwaway number is incremented & encoding restarts.
 
-Decoding is the same process but in reverse.
+Decoding is the same process but in reverse, with a few exceptions:
+
+- Once the `partition` character is found, everything to the left of it gets thrown away.
+- There is of course nothing to do regarding checking the `blacklist` and `minLength` requirements.
 
 ## 📋 Notes
 
@@ -74,8 +79,8 @@ Decoding is the same process but in reverse.
 - [x] Check if can add throwaway partition to the end (not the beginning); might avoid a few extra cycles
 - [x] Add required checks under @todo's
 - [x] Define error handling behavior
-- [ ] Create a universal test suite (great examples [here](https://github.com/niieani/hashids.js/tree/master/src/tests)).
-- [ ] Add non-English words to the default blacklist
+- [x] Add non-English words to the [default blacklist](https://github.com/sqids/sqids-blacklist)
+- [x] Create a universal test suite (great examples [here](https://github.com/niieani/hashids.js/tree/master/src/tests)).
 
 ## 🍻 License
 

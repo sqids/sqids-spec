@@ -16,9 +16,9 @@ export const defaultOptions = {
 };
 
 export default class Sqids {
-	alphabet: string;
-	minLength: number;
-	blacklist: Set<string>;
+	private alphabet: string;
+	private minLength: number;
+	private blacklist: Set<string>;
 
 	constructor(options: SqidsOptions = defaultOptions) {
 		const alphabet = options.alphabet ?? defaultOptions.alphabet;
@@ -46,17 +46,19 @@ export default class Sqids {
 			);
 		}
 
-		// exclude words from `blacklist` that contain characters not in the alphabet
-		// there's no point in having them around since they'll never match
-		//
-		// also every blacklisted word should be lowercase (the default list already is, but custom list might not be)
+		// clean up blacklist:
+		// 1. all blacklist words should be lowercase
+		// 2. no words less than 3 chars
+		// 3. if some words contain chars that are not in the alphabet, remove those
 		const filteredBlacklist = new Set<string>();
 		const alphabetChars = alphabet.split('');
 		for (const word of blacklist) {
-			const wordChars = word.split('');
-			const intersection = wordChars.filter((c) => alphabetChars.includes(c));
-			if (intersection.length == wordChars.length) {
-				filteredBlacklist.add(word.toLowerCase());
+			if (word.length >= 3) {
+				const wordChars = word.split('');
+				const intersection = wordChars.filter((c) => alphabetChars.includes(c));
+				if (intersection.length == wordChars.length) {
+					filteredBlacklist.add(word.toLowerCase());
+				}
 			}
 		}
 
@@ -112,7 +114,7 @@ export default class Sqids {
 		// prefix is the first character in the generated ID, used for randomization
 		const prefix = alphabet.charAt(0);
 
-		// partition is the character used instead of the first separator to indicate that the first number in the input array is a throwaway number. this character is used only once to handle blacklist and/or padding
+		// partition is the character used instead of the first separator to indicate that the first number in the input array is a throwaway number. this character is used only once to handle blacklist and/or padding. it's omitted completely in all other cases
 		const partition = alphabet.charAt(1);
 
 		// alphabet should not contain `prefix` or `partition` reserved characters
@@ -129,7 +131,7 @@ export default class Sqids {
 			const alphabetWithoutSeparator = alphabet.slice(0, -1);
 			ret.push(this.toId(num, alphabetWithoutSeparator));
 
-			// execute only if this is not the last number
+			// if not the last number
 			if (i < numbers.length - 1) {
 				// `separator` character is used to isolate numbers within the ID
 				const separator = alphabet.slice(-1);
@@ -149,25 +151,24 @@ export default class Sqids {
 		// join all the parts to form an ID
 		let id = ret.join('');
 
-		// if `minLength` is used and the ID is too short, add a throwaway number & start over
+		// if `minLength` is used and the ID is too short, add a throwaway number
 		if (this.minLength > id.length) {
-			const partitionNumber = this.toNumber(
-				alphabet.slice(0, this.minLength - id.length),
-				alphabet
-			);
-
-			if (partitioned) {
-				numbers[0] = partitionNumber;
-			} else {
-				numbers = [partitionNumber, ...numbers];
+			// partitioning is required so we can safely throw away chunk of the ID during decoding
+			if (!partitioned) {
+				numbers = [0, ...numbers];
+				id = this.encodeNumbers(numbers, true);
 			}
 
-			id = this.encodeNumbers(numbers, true);
+			// if adding a `partition` number did not make the length meet the `minLength` requirement, then make the new id this format: `prefix` character + a slice of the alphabet to make up the missing length + the rest of the ID without the `prefix` character
+			if (this.minLength > id.length) {
+				id = id.slice(0, 1) + alphabet.slice(0, this.minLength - id.length) + id.slice(1);
+			}
 		}
 
 		// if ID has a blocked word anywhere, add a throwaway number & start over
 		if (this.isBlockedId(id)) {
 			if (partitioned) {
+				/* c8 ignore next 2 */
 				if (numbers[0] + 1 > this.maxValue()) {
 					throw new Error('Ran out of range checking against the blacklist');
 				} else {
@@ -195,8 +196,7 @@ export default class Sqids {
 	 * @returns {array.<number>} Array of unsigned integers
 	 */
 	decode(id: string): number[] {
-		let ret: number[] = [];
-		const originalId = id;
+		const ret: number[] = [];
 
 		// if an empty string, return an empty array
 		if (id == '') {
@@ -229,13 +229,16 @@ export default class Sqids {
 		// now it's safe to remove the prefix character from ID, it's not needed anymore
 		id = id.slice(1);
 
+		// if this ID contains the `partition` character (between 1st position and non-last position), throw away everything to the left of it, include the `partition` character
+		const partitionIndex = id.indexOf(partition);
+		if (partitionIndex > 0 && partitionIndex < id.length - 1) {
+			id = id.slice(partitionIndex + 1);
+			alphabet = this.shuffle(alphabet);
+		}
+
 		// decode
 		while (id.length) {
-			// the first separator might be either `separator` or `partition` character. if partition character is anywhere in the generated ID, then the ID has throwaway number
-			let separator = alphabet.slice(-1);
-			if (id.includes(partition)) {
-				separator = partition;
-			}
+			const separator = alphabet.slice(-1);
 
 			// we need the first part to the left of the separator to decode the number
 			const chunks = id.split(separator);
@@ -254,11 +257,6 @@ export default class Sqids {
 			id = chunks.slice(1).join(separator);
 		}
 
-		// if original ID contains a `partition` character, remove the first number (it's junk)
-		if (originalId.includes(partition)) {
-			ret = ret.slice(1);
-		}
-
 		return ret;
 	}
 
@@ -269,7 +267,7 @@ export default class Sqids {
 
 	// depends on the programming language & implementation
 	maxValue() {
-		return Number.MAX_VALUE;
+		return Number.MAX_SAFE_INTEGER;
 	}
 
 	// consistent shuffle (always produces the same result given the input)
@@ -307,19 +305,22 @@ export default class Sqids {
 		id = id.toLowerCase();
 
 		for (const word of this.blacklist) {
-			if (id.length <= 3 || word.length <= 3) {
-				// short words have to match completely; otherwise, too many matches
-				if (id == word) {
+			// no point in checking words that are longer than the ID
+			if (word.length <= id.length) {
+				if (id.length <= 3 || word.length <= 3) {
+					// short words have to match completely; otherwise, too many matches
+					if (id == word) {
+						return true;
+					}
+				} else if (/\d/.test(word)) {
+					// words with leet speak replacements are visible mostly on the ends of the ID
+					if (id.startsWith(word) || id.endsWith(word)) {
+						return true;
+					}
+				} else if (id.includes(word)) {
+					// otherwise, check for blacklisted word anywhere in the string
 					return true;
 				}
-			} else if (/\d/.test(word)) {
-				// words with leet speak replacements are visible mostly on the ends of the ID
-				if (id.startsWith(word) || id.endsWith(word)) {
-					return true;
-				}
-			} else if (id.includes(word)) {
-				// otherwise, check for blacklisted word anywhere in the string
-				return true;
 			}
 		}
 

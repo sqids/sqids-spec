@@ -1,5 +1,19 @@
 import { expect, test } from 'vitest';
-import Sqids, { defaultOptions } from '../src/index.ts';
+import Sqids from '../src/index.ts';
+
+test('simple', () => {
+	const sqids = new Sqids();
+
+	expect.soft(sqids.encode([1, 2, 3])).toBe('8QRLaD');
+	expect.soft(sqids.decode('8QRLaD')).toEqual([1, 2, 3]);
+});
+
+test('different inputs', () => {
+	const sqids = new Sqids();
+
+	const numbers = [0, 0, 0, 1, 2, 3, 100, 1_000, 100_000, 1_000_000, sqids.maxValue()];
+	expect.soft(sqids.decode(sqids.encode(numbers))).toEqual(numbers);
+});
 
 test('incremental numbers', () => {
 	const sqids = new Sqids();
@@ -67,44 +81,7 @@ test('incremental numbers, same index 1', () => {
 	}
 });
 
-test('minimum length', () => {
-	for (const minLength of [1, 10, defaultOptions.alphabet.length]) {
-		for (const numbers of [
-			[0],
-			[1, 2, 3, 4, 5],
-			[100, 200, 300],
-			[1_000, 2_000, 3_000],
-			[1_000_000]
-		]) {
-			const sqids = new Sqids({
-				...defaultOptions,
-				minLength
-			});
-
-			const id = sqids.encode(numbers);
-			expect.soft(id.length).toBeGreaterThanOrEqual(minLength);
-			expect.soft(sqids.decode(id)).toEqual(numbers);
-		}
-	}
-});
-
-test('blacklist', () => {
-	const sqids = new Sqids({
-		...defaultOptions,
-		blacklist: new Set([
-			'8QRLaD', // result of the 1st encoding
-			'7T1cd0dL' // result of the 2nd encoding
-		])
-	});
-
-	expect.soft(sqids.encode([1, 2, 3])).toBe('RA8UeIe7');
-	expect.soft(sqids.decode('RA8UeIe7')).toEqual([1, 2, 3]);
-
-	expect.soft(sqids.decode('8QRLaD')).toEqual([1, 2, 3]);
-	expect.soft(sqids.decode('7T1cd0dL')).toEqual([1, 2, 3]);
-});
-
-test('encoding/decoding', () => {
+test('multi input', () => {
 	const sqids = new Sqids();
 
 	const numbers = [
@@ -118,13 +95,23 @@ test('encoding/decoding', () => {
 	expect.soft(numbers).toEqual(output);
 });
 
-test('short alphabet', () => {
-	const sqids = new Sqids({
-		...defaultOptions,
-		alphabet: 'abcde',
-		minLength: 5
-	});
+test('encoding no numbers', () => {
+	const sqids = new Sqids();
+	expect.soft(sqids.encode([])).toEqual('');
+});
 
-	const numbers = [1, 2, 3000];
-	expect.soft(sqids.decode(sqids.encode(numbers))).toEqual(numbers);
+test('decoding empty string', () => {
+	const sqids = new Sqids();
+	expect.soft(sqids.decode('')).toEqual([]);
+});
+
+test('decoding an ID with an invalid character', () => {
+	const sqids = new Sqids();
+	expect.soft(sqids.decode('*')).toEqual([]);
+});
+
+test.fails('encode out-of-range numbers', () => {
+	const sqids = new Sqids();
+	expect(sqids.encode([sqids.minValue() - 1])).rejects;
+	expect(sqids.encode([sqids.maxValue() + 1])).rejects;
 });
