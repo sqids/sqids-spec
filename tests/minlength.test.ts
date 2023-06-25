@@ -42,9 +42,9 @@ test('incremental numbers', () => {
 test('min lengths', () => {
 	const sqids = new Sqids();
 
-	for (const minLength of [1, 5, 10, defaultOptions.alphabet.length]) {
+	for (const minLength of [0, 1, 5, 10, defaultOptions.alphabet.length]) {
 		for (const numbers of [
-			[0],
+			[sqids.minValue()],
 			[0, 0, 0, 0, 0],
 			[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
 			[100, 200, 300],
