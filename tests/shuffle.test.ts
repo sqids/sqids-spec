@@ -2,6 +2,7 @@ import { expect, test } from 'vitest';
 import { defaultOptions } from '../src/index.ts';
 
 // `shuffle` is an internal function, so these are tests to check how well it shuffles
+// there's no need for individual implementations to copy over these tests
 
 const shuffle = (alphabet: string): string => {
 	const chars = alphabet.split('');
