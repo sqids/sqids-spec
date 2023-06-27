@@ -1,9 +1,8 @@
 import { expect, test } from 'vitest';
-import Sqids, { defaultOptions } from '../src/index.ts';
+import Sqids from '../src/index.ts';
 
 test('simple', () => {
 	const sqids = new Sqids({
-		...defaultOptions,
 		alphabet: '0123456789abcdef'
 	});
 
@@ -16,7 +15,6 @@ test('simple', () => {
 
 test('short alphabet', () => {
 	const sqids = new Sqids({
-		...defaultOptions,
 		alphabet: 'abcde'
 	});
 
@@ -26,7 +24,6 @@ test('short alphabet', () => {
 
 test('long alphabet', () => {
 	const sqids = new Sqids({
-		...defaultOptions,
 		alphabet:
 			'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_+|{}[];:\'"/?.>,<`~'
 	});
@@ -38,7 +35,6 @@ test('long alphabet', () => {
 test.fails('repeating alphabet characters', () => {
 	expect(
 		new Sqids({
-			...defaultOptions,
 			alphabet: 'aabcdefg'
 		})
 	).rejects;
@@ -47,7 +43,6 @@ test.fails('repeating alphabet characters', () => {
 test.fails('too short of an alphabet', () => {
 	expect(
 		new Sqids({
-			...defaultOptions,
 			alphabet: 'abcd'
 		})
 	).rejects;

@@ -3,7 +3,6 @@ import Sqids, { defaultOptions } from '../src/index.ts';
 
 test('simple', () => {
 	const sqids = new Sqids({
-		...defaultOptions,
 		minLength: defaultOptions.alphabet.length
 	});
 
@@ -16,7 +15,6 @@ test('simple', () => {
 
 test('incremental numbers', () => {
 	const sqids = new Sqids({
-		...defaultOptions,
 		minLength: defaultOptions.alphabet.length
 	});
 
@@ -53,7 +51,6 @@ test('min lengths', () => {
 			[sqids.maxValue()]
 		]) {
 			const sqids = new Sqids({
-				...defaultOptions,
 				minLength
 			});
 
@@ -67,14 +64,12 @@ test('min lengths', () => {
 test.fails('out-of-range invalid min length', () => {
 	expect(
 		new Sqids({
-			...defaultOptions,
 			minLength: -1
 		})
 	).rejects;
 
 	expect(
 		new Sqids({
-			...defaultOptions,
 			minLength: defaultOptions.alphabet.length + 1
 		})
 	).rejects;

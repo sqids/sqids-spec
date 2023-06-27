@@ -5,7 +5,6 @@ const upper = 1_000_000;
 
 test('uniques, with padding', () => {
 	const sqids = new Sqids({
-		...defaultOptions,
 		minLength: defaultOptions.alphabet.length
 	});
 	const set = new Set<string>();

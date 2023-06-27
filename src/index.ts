@@ -1,9 +1,9 @@
-import blacklist from './blacklist.json';
+import defaultBlacklist from './blacklist.json';
 
 type SqidsOptions = {
-	alphabet: string;
-	minLength: number;
-	blacklist: Set<string>;
+	alphabet?: string;
+	minLength?: number;
+	blacklist?: Set<string>;
 };
 
 export const defaultOptions = {
@@ -12,7 +12,7 @@ export const defaultOptions = {
 	// `minLength` is the minimum length IDs should be
 	minLength: 0,
 	// a list of words that should not appear anywhere in the IDs
-	blacklist: new Set<string>(blacklist)
+	blacklist: new Set<string>()
 };
 
 export default class Sqids {
@@ -20,10 +20,10 @@ export default class Sqids {
 	private minLength: number;
 	private blacklist: Set<string>;
 
-	constructor(options: SqidsOptions = defaultOptions) {
-		const alphabet = options.alphabet ?? defaultOptions.alphabet;
-		const minLength = options.minLength ?? defaultOptions.minLength;
-		const blacklist = new Set([...defaultOptions.blacklist, ...options.blacklist]);
+	constructor(options?: SqidsOptions) {
+		const alphabet = options?.alphabet ?? defaultOptions.alphabet;
+		const minLength = options?.minLength ?? defaultOptions.minLength;
+		const blacklist = options?.blacklist ?? new Set<string>(defaultBlacklist);
 
 		// check the length of the alphabet
 		if (alphabet.length < 5) {
