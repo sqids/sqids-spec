@@ -62,6 +62,17 @@ Decoding is the same process but in reverse, with a few exceptions:
 - Once the `partition` character is found, everything to the left of it gets thrown away.
 - There is nothing done regarding `blacklist` and `minLength` requirements, those are used for encoding.
 
+## 📦 Porting to a new language
+
+Implementations of new languages are more than welcome! To start:
+
+1. Make sure you have access to the org's repo. The format is `https://github.com/sqids/sqids-[LANGUAGE]`. If you don't have access, ask one of the maintainers for access. If it doesn't exist, ask [@4kimov](https://github.com/4kimov) to create it and add you.
+1. The main spec is here: <https://github.com/sqids/sqids-spec/blob/main/src/index.ts>. It's under 400 lines of code and heavily commented. Comments are there for clarity, they don't have to exist in your own implementation.
+1. Please use the blacklist from <https://github.com/sqids/sqids-blacklist> (copy and paste the output it gives you into your own code). It will contain the most up-to-date list. Do not copy and paste the blacklist from other implementations, as they might not be up-to-date.
+1. Be sure to implement unit tests. We want to make sure all implementations produce the same IDs. Unit tests are here: <https://github.com/sqids/sqids-spec/tree/main/tests>.
+1. If you're publishing to a package manager, please add a co-maintainer so more than one person has access.
+1. When done, please let [@4kimov](https://github.com/4kimov) know so we can update the website.
+
 ## 📋 Notes
 
 - The reason `prefix` character is used is to randomize sequential inputs (eg: [0, 1], [0, 2], [0, 3]). Without the extra `prefix` character embedded into the ID, the output would start with the same characters.
