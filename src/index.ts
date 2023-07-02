@@ -1,9 +1,9 @@
-import defaultBlacklist from './blacklist.json';
+import defaultBlocklist from './blocklist.json';
 
 type SqidsOptions = {
 	alphabet?: string;
 	minLength?: number;
-	blacklist?: Set<string>;
+	blocklist?: Set<string>;
 };
 
 export const defaultOptions = {
@@ -12,18 +12,18 @@ export const defaultOptions = {
 	// `minLength` is the minimum length IDs should be
 	minLength: 0,
 	// a list of words that should not appear anywhere in the IDs
-	blacklist: new Set<string>()
+	blocklist: new Set<string>()
 };
 
 export default class Sqids {
 	private alphabet: string;
 	private minLength: number;
-	private blacklist: Set<string>;
+	private blocklist: Set<string>;
 
 	constructor(options?: SqidsOptions) {
 		const alphabet = options?.alphabet ?? defaultOptions.alphabet;
 		const minLength = options?.minLength ?? defaultOptions.minLength;
-		const blacklist = options?.blacklist ?? new Set<string>(defaultBlacklist);
+		const blocklist = options?.blocklist ?? new Set<string>(defaultBlocklist);
 
 		// check the length of the alphabet
 		if (alphabet.length < 5) {
@@ -46,25 +46,25 @@ export default class Sqids {
 			);
 		}
 
-		// clean up blacklist:
-		// 1. all blacklist words should be lowercase
+		// clean up blocklist:
+		// 1. all blocklist words should be lowercase
 		// 2. no words less than 3 chars
 		// 3. if some words contain chars that are not in the alphabet, remove those
-		const filteredBlacklist = new Set<string>();
+		const filteredBlocklist = new Set<string>();
 		const alphabetChars = alphabet.split('');
-		for (const word of blacklist) {
+		for (const word of blocklist) {
 			if (word.length >= 3) {
 				const wordChars = word.split('');
 				const intersection = wordChars.filter((c) => alphabetChars.includes(c));
 				if (intersection.length == wordChars.length) {
-					filteredBlacklist.add(word.toLowerCase());
+					filteredBlocklist.add(word.toLowerCase());
 				}
 			}
 		}
 
 		this.alphabet = this.shuffle(alphabet);
 		this.minLength = minLength;
-		this.blacklist = filteredBlacklist;
+		this.blocklist = filteredBlocklist;
 	}
 
 	/**
@@ -98,7 +98,7 @@ export default class Sqids {
 	 * Internal function that encodes an array of unsigned integers into an ID
 	 *
 	 * @param {array.<number>} numbers Positive integers to encode into an ID
-	 * @param {boolean} partitioned If true, the first number is always a throwaway number (used either for blacklist or padding)
+	 * @param {boolean} partitioned If true, the first number is always a throwaway number (used either for blocklist or padding)
 	 * @returns {string} Generated ID
 	 */
 	private encodeNumbers(numbers: number[], partitioned = false): string {
@@ -114,7 +114,7 @@ export default class Sqids {
 		// prefix is the first character in the generated ID, used for randomization
 		const prefix = alphabet.charAt(0);
 
-		// partition is the character used instead of the first separator to indicate that the first number in the input array is a throwaway number. this character is used only once to handle blacklist and/or padding. it's omitted completely in all other cases
+		// partition is the character used instead of the first separator to indicate that the first number in the input array is a throwaway number. this character is used only once to handle blocklist and/or padding. it's omitted completely in all other cases
 		const partition = alphabet.charAt(1);
 
 		// alphabet should not contain `prefix` or `partition` reserved characters
@@ -170,7 +170,7 @@ export default class Sqids {
 			if (partitioned) {
 				/* c8 ignore next 2 */
 				if (numbers[0] + 1 > this.maxValue()) {
-					throw new Error('Ran out of range checking against the blacklist');
+					throw new Error('Ran out of range checking against the blocklist');
 				} else {
 					numbers[0] += 1;
 				}
@@ -304,7 +304,7 @@ export default class Sqids {
 	private isBlockedId(id: string): boolean {
 		id = id.toLowerCase();
 
-		for (const word of this.blacklist) {
+		for (const word of this.blocklist) {
 			// no point in checking words that are longer than the ID
 			if (word.length <= id.length) {
 				if (id.length <= 3 || word.length <= 3) {
@@ -318,7 +318,7 @@ export default class Sqids {
 						return true;
 					}
 				} else if (id.includes(word)) {
-					// otherwise, check for blacklisted word anywhere in the string
+					// otherwise, check for blocked word anywhere in the string
 					return true;
 				}
 			}
