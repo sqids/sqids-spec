@@ -2,8 +2,6 @@
 
 [![Github Actions](https://img.shields.io/github/actions/workflow/status/sqids/sqids/tests.yml?style=flat-square)](https://github.com/sqids/sqids/actions)
 
-> 🏗️ This is still a work in progress. Do not use in production.
-
 This is the main repository for Sqids specification. It is meant to be the guide for future ports of different languages.
 
 **The code is optimized for readability and clarity**; _individual implementations should optimize for performance as needed_.
