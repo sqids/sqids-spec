@@ -74,7 +74,7 @@ export default class Sqids {
 	 * - One of the numbers passed is smaller than `minValue()` or greater than `maxValue()`
 	 * - A partition number is incremented so much that it becomes greater than `maxValue()`
 	 *
-	 * @param {array.<number>} numbers Positive integers to encode into an ID
+	 * @param {array.<number>} numbers Non-negative integers to encode into an ID
 	 * @returns {string} Generated ID
 	 */
 	encode(numbers: number[]): string {
@@ -97,7 +97,7 @@ export default class Sqids {
 	/**
 	 * Internal function that encodes an array of unsigned integers into an ID
 	 *
-	 * @param {array.<number>} numbers Positive integers to encode into an ID
+	 * @param {array.<number>} numbers Non-negative integers to encode into an ID
 	 * @param {boolean} partitioned If true, the first number is always a throwaway number (used either for blocklist or padding)
 	 * @returns {string} Generated ID
 	 */
