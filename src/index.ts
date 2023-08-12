@@ -244,7 +244,13 @@ export default class Sqids {
 			const chunks = id.split(separator);
 			if (chunks.length) {
 				// decode the number without using the `separator` character
+				// but also check that ID can be decoded (eg: does not contain any non-alphabet characters)
 				const alphabetWithoutSeparator = alphabet.slice(0, -1);
+				for (const c of chunks[0]) {
+					if (!alphabetWithoutSeparator.includes(c)) {
+						return [];
+					}
+				}
 				ret.push(this.toNumber(chunks[0], alphabetWithoutSeparator));
 
 				// if this ID has multiple numbers, shuffle the alphabet because that's what encoding function did

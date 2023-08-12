@@ -113,6 +113,11 @@ test('decoding an ID with an invalid character', () => {
 	expect.soft(sqids.decode('*')).toEqual([]);
 });
 
+test('decoding an invalid ID with a repeating reserved character', () => {
+	const sqids = new Sqids();
+	expect.soft(sqids.decode('fff')).toEqual([]);
+});
+
 test.fails('encode out-of-range numbers', () => {
 	const sqids = new Sqids();
 	expect(sqids.encode([sqids.minValue() - 1])).rejects;
