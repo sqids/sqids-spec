@@ -75,8 +75,8 @@ test('blocklist filtering in constructor', () => {
 		blocklist: new Set(['sqnmpn']) // lowercase blocklist in only-uppercase alphabet
 	});
 
-	let id = sqids.encode([1, 2, 3]);
-	let numbers = sqids.decode(id);
+	const id = sqids.encode([1, 2, 3]);
+	const numbers = sqids.decode(id);
 
 	expect.soft(id).toEqual('ULPBZGBM'); // without blocklist, would've been "SQNMPN"
 	expect.soft(numbers).toEqual([1, 2, 3]);
