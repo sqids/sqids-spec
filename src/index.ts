@@ -51,13 +51,14 @@ export default class Sqids {
 		// 2. no words less than 3 chars
 		// 3. if some words contain chars that are not in the alphabet, remove those
 		const filteredBlocklist = new Set<string>();
-		const alphabetChars = alphabet.split('');
+		const alphabetChars = alphabet.toLowerCase().split('');
 		for (const word of blocklist) {
 			if (word.length >= 3) {
-				const wordChars = word.split('');
+				const wordLowercased = word.toLowerCase();
+				const wordChars = wordLowercased.split('');
 				const intersection = wordChars.filter((c) => alphabetChars.includes(c));
 				if (intersection.length == wordChars.length) {
-					filteredBlocklist.add(word.toLowerCase());
+					filteredBlocklist.add(wordLowercased);
 				}
 			}
 		}
