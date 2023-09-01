@@ -118,8 +118,11 @@ export default class Sqids {
 		// partition is the character used instead of the first separator to indicate that the first number in the input array is a throwaway number. this character is used only once to handle blocklist and/or padding. it's omitted completely in all other cases
 		const partition = alphabet.charAt(1);
 
-		// alphabet should not contain `prefix` or `partition` reserved characters
-		alphabet = alphabet.slice(2);
+		// junk separator is the character that separates the junk characters that are added to the ID when the min length requirement isn't met from the rest of the ID
+		const junkSeparator = alphabet.charAt(2);
+
+		// alphabet should not contain `prefix`, `partition`, or `junkSeparator` reserved characters
+		alphabet = alphabet.slice(3);
 
 		// final ID will always have the `prefix` character at the beginning
 		const ret = [prefix];
@@ -152,17 +155,13 @@ export default class Sqids {
 		// join all the parts to form an ID
 		let id = ret.join('');
 
-		// if `minLength` is used and the ID is too short, add a throwaway number
+		// if `minLength` is used and the ID is too short, add junk characters
 		if (this.minLength > id.length) {
-			// partitioning is required so we can safely throw away chunk of the ID during decoding
-			if (!partitioned) {
-				numbers = [0, ...numbers];
-				id = this.encodeNumbers(numbers, true);
-			}
-
-			// if adding a `partition` number did not make the length meet the `minLength` requirement, then make the new id this format: `prefix` character + a slice of the alphabet to make up the missing length + the rest of the ID without the `prefix` character
-			if (this.minLength > id.length) {
-				id = id.slice(0, 1) + alphabet.slice(0, this.minLength - id.length) + id.slice(1);
+			id = id.slice(0, 1) + junkSeparator + id.slice(1);
+			const leftToMeetMinLength = this.minLength - id.length;
+			if (leftToMeetMinLength > 0) {
+				const junk = alphabet.slice(0, leftToMeetMinLength);
+				id = id.slice(0, 1) + junk + id.slice(1);
 			}
 		}
 
@@ -223,12 +222,16 @@ export default class Sqids {
 
 		// `partition` character is in second position
 		const partition = alphabet.charAt(1);
+		// `junkSeparator` character is in third position
+		const junkSeparator = alphabet.charAt(2);
 
-		// alphabet has to be without reserved `prefix` & `partition` characters
-		alphabet = alphabet.slice(2);
+		// alphabet has to be without reserved `prefix`, `partition`, and `junkSeparator` characters
+		alphabet = alphabet.slice(3);
 
 		// now it's safe to remove the prefix character from ID, it's not needed anymore
 		id = id.slice(1);
+		// we also remove everything to the left of the junk separator + the junk separator itself
+		id = id.slice(id.indexOf(junkSeparator) + 1);
 
 		// if this ID contains the `partition` character (between 1st position and non-last position), throw away everything to the left of it, include the `partition` character
 		const partitionIndex = id.indexOf(partition);
