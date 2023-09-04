@@ -7,7 +7,7 @@ test('simple', () => {
 	});
 
 	const numbers = [1, 2, 3];
-	const id = '4d9fd2';
+	const id = '489158';
 
 	expect.soft(sqids.encode(numbers)).toBe(id);
 	expect.soft(sqids.decode(id)).toEqual(numbers);
@@ -15,7 +15,7 @@ test('simple', () => {
 
 test('short alphabet', () => {
 	const sqids = new Sqids({
-		alphabet: 'abcde'
+		alphabet: 'abc'
 	});
 
 	const numbers = [1, 2, 3];
@@ -43,7 +43,7 @@ test.fails('repeating alphabet characters', () => {
 test.fails('too short of an alphabet', () => {
 	expect(
 		new Sqids({
-			alphabet: 'abcd'
+			alphabet: 'ab'
 		})
 	).rejects;
 });

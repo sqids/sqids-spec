@@ -28,10 +28,10 @@ npm run lint
 
 1. The user is not required to provide randomized input anymore (there's still support for custom IDs).
 1. Better internal alphabet shuffling function.
-1. With default alphabet - Hashids is using base 49 for encoding-only, whereas Sqids is using base 60.
+1. With default alphabet - Hashids is using base 49 for encoding-only, whereas Sqids is using base 61.
 1. Safer public IDs, with support for custom blocklist of words.
 1. Separators are no longer limited to characters "c, s, f, h, u, i, t". Instead, it's one rotating separator assigned on the fly.
-1. Simpler & smaller implementation: only "encode", "decode", "minValue", "maxValue" functions.
+1. Simpler & smaller implementation: only "encode" & "decode" functions.
 
 ## 🔬 How it works
 
@@ -39,26 +39,27 @@ Sqids is basically a decimal to hexademical conversion, but with a few extra fea
 
 Here's how encoding works:
 
-1. A pseudo-random alphabet offset integer is chosen from the given input.
-1. Alphabet is split into two pieces using that offset and that parts are swapped.
-1. Two characters are reserved from that alphabet, named `prefix` and `partition` (`prefix` is always the first character of the generated ID; `partition` is the character that acts as a separator between throwaway number and real numbers).
+1. An `offset` index is chosen from the given input
+1. Alphabet is split into two pieces using that offset and those two halfs are swapped
+1. Alphabet is reversed
 1. For each input number:
-   1. Another character is reserved from the alphabet, named `separator`.
-   1. The rest of the alphabet is used to encode the number into an ID.
-   1. If this is not the last number in the input array, either a `partition` or a `separator` character is appended (depending on the index & whether the numbers are partitioned or not).
-   1. The alphabet is shuffled.
+   1. The first character from the alphabet is reserved to be used as `separator`
+   1. The rest of the alphabet is used to encode the number into an ID
+   1. If this is not the last number in the input array, the `separator` character is appended
+   1. The alphabet is shuffled
 1. If the generated ID does not meet the `minLength` requirement:
-   - If this is the first time, a throwaway number is prepended to the input array.
-   - Number are encoded again to generate a new ID (this time partitioned).
-   - If the `minLength` requirement is still not met, a new ID is composed in this way: the `prefix` character + a slice of the alphabet to make up the missing length + the rest of the ID without the `prefix` character.
+   - The `separator` character is appended
+   - If still does not meet requirement:
+     - Another shuffle occurs
+     - The `separator` character is again appended to the remaining id + however many characters needed to meet the requirement
 1. If the blocklist function matches the generated ID:
-   - If this is the first time, a throwaway number is prepended to the input array & encoding restarts (this time partitioned).
-   - If the throwaway number has also matched the blocklist, then the throwaway number is incremented & encoding restarts.
+   - `offset` index is incremented by 1, but never more than the length of the alphabet (in that case throw error)
+   - Re-encode (repeat the whole procedure again)
 
-Decoding is the same process but in reverse, with a few exceptions:
+Decoding is the same process but in reverse. A few things worth noting:
 
-- Once the `partition` character is found, everything to the left of it gets thrown away.
-- There is nothing done regarding `blocklist` and `minLength` requirements, those are used for encoding.
+- If two separators are right next to each other within the ID, that's fine - it just means the rest of the ID are junk characters used to satisfy the `minLength` requirement
+- The decoding function does not check if ID is valid/canonical, because we want blocked IDs to still be decodable (the user can check for this stuff themselves by re-encoding decoded numbers)
 
 ## 📦 Porting to a new language
 

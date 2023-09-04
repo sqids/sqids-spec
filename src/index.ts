@@ -26,8 +26,8 @@ export default class Sqids {
 		const blocklist = options?.blocklist ?? new Set<string>(defaultBlocklist);
 
 		// check the length of the alphabet
-		if (alphabet.length < 5) {
-			throw new Error('Alphabet length must be at least 5');
+		if (alphabet.length < 3) {
+			throw new Error('Alphabet length must be at least 3');
 		}
 
 		// check that the alphabet has only unique characters
@@ -36,14 +36,8 @@ export default class Sqids {
 		}
 
 		// test min length (type [might be lang-specific] + min length + max length)
-		if (
-			typeof minLength != 'number' ||
-			minLength < this.minValue() ||
-			minLength > alphabet.length
-		) {
-			throw new TypeError(
-				`Minimum length has to be between ${this.minValue()} and ${alphabet.length}`
-			);
+		if (typeof minLength != 'number' || minLength < 0 || minLength > 1_000) {
+			throw new TypeError(`Minimum length has to be between 0 and ${1_000}`);
 		}
 
 		// clean up blocklist:
@@ -72,8 +66,8 @@ export default class Sqids {
 	 * Encodes an array of unsigned integers into an ID
 	 *
 	 * These are the cases where encoding might fail:
-	 * - One of the numbers passed is smaller than `minValue()` or greater than `maxValue()`
-	 * - A partition number is incremented so much that it becomes greater than `maxValue()`
+	 * - One of the numbers passed is smaller than 0 or greater than `maxValue()`
+	 * - An n-number of attempts has been made to re-generated the ID, where n is alphabet length + 1
 	 *
 	 * @param {array.<number>} numbers Non-negative integers to encode into an ID
 	 * @returns {string} Generated ID
@@ -85,11 +79,9 @@ export default class Sqids {
 		}
 
 		// don't allow out-of-range numbers [might be lang-specific]
-		const inRangeNumbers = numbers.filter((n) => n >= this.minValue() && n <= this.maxValue());
+		const inRangeNumbers = numbers.filter((n) => n >= 0 && n <= this.maxValue());
 		if (inRangeNumbers.length != numbers.length) {
-			throw new Error(
-				`Encoding supports numbers between ${this.minValue()} and ${this.maxValue()}`
-			);
+			throw new Error(`Encoding supports numbers between 0 and ${this.maxValue()}`);
 		}
 
 		return this.encodeNumbers(numbers, false);
@@ -99,27 +91,32 @@ export default class Sqids {
 	 * Internal function that encodes an array of unsigned integers into an ID
 	 *
 	 * @param {array.<number>} numbers Non-negative integers to encode into an ID
-	 * @param {boolean} partitioned If true, the first number is always a throwaway number (used either for blocklist or padding)
+	 * @param {number} increment An internal number used to modify the `offset` variable in order to re-generate the ID
 	 * @returns {string} Generated ID
 	 */
-	private encodeNumbers(numbers: number[], partitioned = false): string {
+	private encodeNumbers(numbers: number[], increment = 0): string {
+		// if increment is greater than alphabet length, we've reached max attempts
+		if (increment > this.alphabet.length) {
+			throw new Error('Reached max attempts to re-generate the ID');
+		}
+
 		// get a semi-random offset from input numbers
-		const offset =
+		let offset =
 			numbers.reduce((a, v, i) => {
 				return this.alphabet[v % this.alphabet.length].codePointAt(0) + i + a;
 			}, numbers.length) % this.alphabet.length;
 
+		// if there is a non-zero `increment`, it's an internal attempt to re-generated the ID
+		offset = (offset + increment) % this.alphabet.length;
+
 		// re-arrange alphabet so that second-half goes in front of the first-half
 		let alphabet = this.alphabet.slice(offset) + this.alphabet.slice(0, offset);
 
-		// prefix is the first character in the generated ID, used for randomization
+		// `prefix` is the first character in the generated ID, used for randomization
 		const prefix = alphabet.charAt(0);
 
-		// partition is the character used instead of the first separator to indicate that the first number in the input array is a throwaway number. this character is used only once to handle blocklist and/or padding. it's omitted completely in all other cases
-		const partition = alphabet.charAt(1);
-
-		// alphabet should not contain `prefix` or `partition` reserved characters
-		alphabet = alphabet.slice(2);
+		// reverse alphabet (otherwise for [0, x] `offset` and `separator` will be the same char)
+		alphabet = alphabet.split('').reverse().join('');
 
 		// final ID will always have the `prefix` character at the beginning
 		const ret = [prefix];
@@ -128,21 +125,14 @@ export default class Sqids {
 		for (let i = 0; i != numbers.length; i++) {
 			const num = numbers[i];
 
-			// the last character of the alphabet is going to be reserved for the `separator`
-			const alphabetWithoutSeparator = alphabet.slice(0, -1);
+			// the first character of the alphabet is going to be reserved for the `separator`
+			const alphabetWithoutSeparator = alphabet.slice(1);
 			ret.push(this.toId(num, alphabetWithoutSeparator));
 
 			// if not the last number
 			if (i < numbers.length - 1) {
 				// `separator` character is used to isolate numbers within the ID
-				const separator = alphabet.slice(-1);
-
-				// for the barrier use the `separator` unless this is the first iteration and the first number is a throwaway number - then use the `partition` character
-				if (partitioned && i == 0) {
-					ret.push(partition);
-				} else {
-					ret.push(separator);
-				}
+				ret.push(alphabet.slice(0, 1));
 
 				// shuffle on every iteration
 				alphabet = this.shuffle(alphabet);
@@ -154,32 +144,19 @@ export default class Sqids {
 
 		// if `minLength` is used and the ID is too short, add a throwaway number
 		if (this.minLength > id.length) {
-			// partitioning is required so we can safely throw away chunk of the ID during decoding
-			if (!partitioned) {
-				numbers = [0, ...numbers];
-				id = this.encodeNumbers(numbers, true);
-			}
+			// append a separator
+			id += alphabet.slice(0, 1);
 
-			// if adding a `partition` number did not make the length meet the `minLength` requirement, then make the new id this format: `prefix` character + a slice of the alphabet to make up the missing length + the rest of the ID without the `prefix` character
-			if (this.minLength > id.length) {
-				id = id.slice(0, 1) + alphabet.slice(0, this.minLength - id.length) + id.slice(1);
+			// keep appending `separator` followed by however much alphabet is needed
+			while (this.minLength - id.length > 0) {
+				alphabet = this.shuffle(alphabet);
+				id += alphabet.slice(0, Math.min(this.minLength - id.length, alphabet.length));
 			}
 		}
 
-		// if ID has a blocked word anywhere, add a throwaway number & start over
+		// if ID has a blocked word anywhere, restart with a +1 increment
 		if (this.isBlockedId(id)) {
-			if (partitioned) {
-				/* c8 ignore next 2 */
-				if (numbers[0] + 1 > this.maxValue()) {
-					throw new Error('Ran out of range checking against the blocklist');
-				} else {
-					numbers[0] += 1;
-				}
-			} else {
-				numbers = [0, ...numbers];
-			}
-
-			id = this.encodeNumbers(numbers, true);
+			id = this.encodeNumbers(numbers, increment + 1);
 		}
 
 		return id;
@@ -190,7 +167,6 @@ export default class Sqids {
 	 *
 	 * These are the cases where the return value might be an empty array:
 	 * - Empty ID / empty string
-	 * - Invalid ID passed (reserved character is in the wrong place)
 	 * - Non-alphabet character is found within ID
 	 *
 	 * @param {string} id Encoded ID
@@ -221,32 +197,27 @@ export default class Sqids {
 		// re-arrange alphabet back into it's original form
 		let alphabet = this.alphabet.slice(offset) + this.alphabet.slice(0, offset);
 
-		// `partition` character is in second position
-		const partition = alphabet.charAt(1);
-
-		// alphabet has to be without reserved `prefix` & `partition` characters
-		alphabet = alphabet.slice(2);
+		// reverse alphabet
+		alphabet = alphabet.split('').reverse().join('');
 
 		// now it's safe to remove the prefix character from ID, it's not needed anymore
 		id = id.slice(1);
 
-		// if this ID contains the `partition` character (between 1st position and non-last position), throw away everything to the left of it, include the `partition` character
-		const partitionIndex = id.indexOf(partition);
-		if (partitionIndex > 0 && partitionIndex < id.length - 1) {
-			id = id.slice(partitionIndex + 1);
-			alphabet = this.shuffle(alphabet);
-		}
-
 		// decode
 		while (id.length) {
-			const separator = alphabet.slice(-1);
+			const separator = alphabet.slice(0, 1);
 
 			// we need the first part to the left of the separator to decode the number
 			const chunks = id.split(separator);
 			if (chunks.length) {
+				// if chunk is empty, we are done (the rest are junk characters)
+				if (chunks[0] == '') {
+					return ret;
+				}
+
 				// decode the number without using the `separator` character
 				// but also check that ID can be decoded (eg: does not contain any non-alphabet characters)
-				const alphabetWithoutSeparator = alphabet.slice(0, -1);
+				const alphabetWithoutSeparator = alphabet.slice(1);
 				for (const c of chunks[0]) {
 					if (!alphabetWithoutSeparator.includes(c)) {
 						return [];
@@ -265,16 +236,6 @@ export default class Sqids {
 		}
 
 		return ret;
-	}
-
-	// always zero for every language
-	minValue() {
-		return 0;
-	}
-
-	// depends on the programming language & implementation
-	maxValue() {
-		return Number.MAX_SAFE_INTEGER;
 	}
 
 	// consistent shuffle (always produces the same result given the input)
@@ -332,5 +293,9 @@ export default class Sqids {
 		}
 
 		return false;
+	}
+
+	private maxValue() {
+		return Number.MAX_SAFE_INTEGER;
 	}
 }
