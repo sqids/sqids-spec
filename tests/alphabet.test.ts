@@ -32,18 +32,29 @@ test('long alphabet', () => {
 	expect.soft(sqids.decode(sqids.encode(numbers))).toEqual(numbers);
 });
 
-test.fails('repeating alphabet characters', () => {
-	expect(
-		new Sqids({
-			alphabet: 'aabcdefg'
-		})
-	).rejects;
+test('multibyte characters', async () => {
+	await expect(
+		async () =>
+			new Sqids({
+				alphabet: 'ë1092'
+			})
+	).rejects.toThrow('Alphabet cannot contain multibyte characters');
 });
 
-test.fails('too short of an alphabet', () => {
-	expect(
-		new Sqids({
-			alphabet: 'ab'
-		})
-	).rejects;
+test('repeating alphabet characters', async () => {
+	await expect(
+		async () =>
+			new Sqids({
+				alphabet: 'aabcdefg'
+			})
+	).rejects.toThrow('Alphabet must contain unique characters');
+});
+
+test('too short of an alphabet', async () => {
+	await expect(
+		async () =>
+			new Sqids({
+				alphabet: 'ab'
+			})
+	).rejects.toThrow('Alphabet length must be at least 3');
 });

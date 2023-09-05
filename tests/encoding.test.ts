@@ -113,8 +113,12 @@ test('decoding an ID with an invalid character', () => {
 	expect.soft(sqids.decode('*')).toEqual([]);
 });
 
-test.fails('encode out-of-range numbers', () => {
+test('encode out-of-range numbers', async () => {
+	const encodingError = `Encoding supports numbers between 0 and ${Number.MAX_SAFE_INTEGER}`;
+
 	const sqids = new Sqids();
-	expect(sqids.encode([-1])).rejects;
-	expect(sqids.encode([Number.MAX_SAFE_INTEGER + 1])).rejects;
+	await expect(async () => sqids.encode([-1])).rejects.toThrow(encodingError);
+	await expect(async () => sqids.encode([Number.MAX_SAFE_INTEGER + 1])).rejects.toThrow(
+		encodingError
+	);
 });

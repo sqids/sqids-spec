@@ -81,3 +81,22 @@ test('blocklist filtering in constructor', () => {
 	expect.soft(id).toEqual('IBSHOZ'); // without blocklist, would've been "SXNZKL"
 	expect.soft(numbers).toEqual([1, 2, 3]);
 });
+
+test('max encoding attempts', async () => {
+	const alphabet = 'abc';
+	const minLength = 3;
+	const blocklist = new Set(['cab', 'abc', 'bca']);
+
+	const sqids = new Sqids({
+		alphabet,
+		minLength,
+		blocklist
+	});
+
+	expect.soft(alphabet.length).toEqual(minLength);
+	expect.soft(blocklist.size).toEqual(minLength);
+
+	await expect(async () => sqids.encode([0])).rejects.toThrow(
+		'Reached max attempts to re-generate the ID'
+	);
+});

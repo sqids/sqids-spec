@@ -25,6 +25,11 @@ export default class Sqids {
 		const minLength = options?.minLength ?? defaultOptions.minLength;
 		const blocklist = options?.blocklist ?? new Set<string>(defaultBlocklist);
 
+		// alphabet cannot contain multibyte characters
+		if (new Blob([alphabet]).size != alphabet.length) {
+			throw new Error('Alphabet cannot contain multibyte characters');
+		}
+
 		// check the length of the alphabet
 		if (alphabet.length < 3) {
 			throw new Error('Alphabet length must be at least 3');
@@ -37,7 +42,7 @@ export default class Sqids {
 
 		// test min length (type [might be lang-specific] + min length + max length)
 		if (typeof minLength != 'number' || minLength < 0 || minLength > 1_000) {
-			throw new TypeError(`Minimum length has to be between 0 and ${1_000}`);
+			throw new Error(`Minimum length has to be between 0 and ${1_000}`);
 		}
 
 		// clean up blocklist:
@@ -142,12 +147,13 @@ export default class Sqids {
 		// join all the parts to form an ID
 		let id = ret.join('');
 
-		// if `minLength` is used and the ID is too short, add a throwaway number
+		// handle `minLength` requirement, if the ID is too short
 		if (this.minLength > id.length) {
 			// append a separator
 			id += alphabet.slice(0, 1);
 
-			// keep appending `separator` followed by however much alphabet is needed
+			// keep appending `separator` + however much alphabet is needed
+			// for decoding: two separators next to each other is what tells us the rest are junk characters
 			while (this.minLength - id.length > 0) {
 				alphabet = this.shuffle(alphabet);
 				id += alphabet.slice(0, Math.min(this.minLength - id.length, alphabet.length));
@@ -216,13 +222,7 @@ export default class Sqids {
 				}
 
 				// decode the number without using the `separator` character
-				// but also check that ID can be decoded (eg: does not contain any non-alphabet characters)
 				const alphabetWithoutSeparator = alphabet.slice(1);
-				for (const c of chunks[0]) {
-					if (!alphabetWithoutSeparator.includes(c)) {
-						return [];
-					}
-				}
 				ret.push(this.toNumber(chunks[0], alphabetWithoutSeparator));
 
 				// if this ID has multiple numbers, shuffle the alphabet because that's what encoding function did

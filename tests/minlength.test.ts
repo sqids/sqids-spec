@@ -92,16 +92,20 @@ test('min lengths', () => {
 	}
 });
 
-test.fails('out-of-range invalid min length', () => {
-	expect(
-		new Sqids({
-			minLength: -1
-		})
-	).rejects;
+test('out-of-range invalid min length', async () => {
+	const minLengthError = 'Minimum length has to be between 0 and 1000';
 
-	expect(
-		new Sqids({
-			minLength: defaultOptions.alphabet.length + 1
-		})
-	).rejects;
+	await expect(
+		async () =>
+			new Sqids({
+				minLength: -1
+			})
+	).rejects.toThrow(minLengthError);
+
+	await expect(
+		async () =>
+			new Sqids({
+				minLength: 1_000 + 1
+			})
+	).rejects.toThrow(minLengthError);
 });
