@@ -93,7 +93,8 @@ test('min lengths', () => {
 });
 
 test('out-of-range invalid min length', async () => {
-	const minLengthError = 'Minimum length has to be between 0 and 1000';
+	const minLengthLimit = 1_000;
+	const minLengthError = `Minimum length has to be between 0 and ${minLengthLimit}`;
 
 	await expect(
 		async () =>
@@ -105,7 +106,7 @@ test('out-of-range invalid min length', async () => {
 	await expect(
 		async () =>
 			new Sqids({
-				minLength: 1_000 + 1
+				minLength: minLengthLimit + 1
 			})
 	).rejects.toThrow(minLengthError);
 });

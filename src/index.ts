@@ -41,8 +41,9 @@ export default class Sqids {
 		}
 
 		// test min length (type [might be lang-specific] + min length + max length)
-		if (typeof minLength != 'number' || minLength < 0 || minLength > 1_000) {
-			throw new Error(`Minimum length has to be between 0 and ${1_000}`);
+		const minLengthLimit = 1_000;
+		if (typeof minLength != 'number' || minLength < 0 || minLength > minLengthLimit) {
+			throw new Error(`Minimum length has to be between 0 and ${minLengthLimit}`);
 		}
 
 		// clean up blocklist:
