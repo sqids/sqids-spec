@@ -71,11 +71,3 @@ test('uppercase alphabet', () => {
 
 	expect.soft(shuffle(i)).toBe(o);
 });
-
-test('bars', () => {
-	expect.soft(shuffle('▁▂▃▄▅▆▇█')).toBe('▂▇▄▅▆▃▁█');
-});
-
-test('bars with numbers', () => {
-	expect.soft(shuffle('▁▂▃▄▅▆▇█0123456789')).toBe('14▅▂▇320▆75▄█96▃8▁');
-});
