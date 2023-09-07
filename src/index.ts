@@ -2,7 +2,7 @@ import defaultBlocklist from './blocklist.json';
 
 type SqidsOptions = {
 	alphabet?: string;
-	minLength?: number;
+	minLength?: number; // u8
 	blocklist?: Set<string>;
 };
 
