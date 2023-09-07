@@ -9,7 +9,7 @@ type SqidsOptions = {
 export const defaultOptions = {
 	// url-safe characters
 	alphabet: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
-	// `minLength` is the minimum length IDs should be
+	// `minLength` is the minimum length IDs should be (`u8` type)
 	minLength: 0,
 	// a list of words that should not appear anywhere in the IDs
 	blocklist: new Set<string>()
@@ -41,7 +41,8 @@ export default class Sqids {
 		}
 
 		// test min length (type [might be lang-specific] + min length + max length)
-		const minLengthLimit = 1_000;
+		// if lang supports `u8` type, you can just omit this check altogether
+		const minLengthLimit = 255;
 		if (typeof minLength != 'number' || minLength < 0 || minLength > minLengthLimit) {
 			throw new Error(`Minimum length has to be between 0 and ${minLengthLimit}`);
 		}

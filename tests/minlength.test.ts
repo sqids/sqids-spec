@@ -92,8 +92,9 @@ test('min lengths', () => {
 	}
 });
 
+// for those langs that don't support `u8`
 test('out-of-range invalid min length', async () => {
-	const minLengthLimit = 1_000;
+	const minLengthLimit = 255;
 	const minLengthError = `Minimum length has to be between 0 and ${minLengthLimit}`;
 
 	await expect(
