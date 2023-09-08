@@ -91,7 +91,7 @@ export default class Sqids {
 			throw new Error(`Encoding supports numbers between 0 and ${this.maxValue()}`);
 		}
 
-		return this.encodeNumbers(numbers, false);
+		return this.encodeNumbers(numbers);
 	}
 
 	/**
