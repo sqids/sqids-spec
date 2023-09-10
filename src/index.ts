@@ -12,7 +12,7 @@ export const defaultOptions = {
 	// `minLength` is the minimum length IDs should be (`u8` type)
 	minLength: 0,
 	// a list of words that should not appear anywhere in the IDs
-	blocklist: new Set<string>()
+	blocklist: new Set<string>(defaultBlocklist)
 };
 
 export default class Sqids {
@@ -23,7 +23,7 @@ export default class Sqids {
 	constructor(options?: SqidsOptions) {
 		const alphabet = options?.alphabet ?? defaultOptions.alphabet;
 		const minLength = options?.minLength ?? defaultOptions.minLength;
-		const blocklist = options?.blocklist ?? new Set<string>(defaultBlocklist);
+		const blocklist = options?.blocklist ?? defaultOptions.blocklist;
 
 		// alphabet cannot contain multibyte characters
 		if (new Blob([alphabet]).size != alphabet.length) {
