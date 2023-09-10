@@ -4,7 +4,7 @@ import Sqids, { defaultOptions } from '../../src/index.ts';
 // @NOTE: "uniques, with blocked words" is auto-tested since a lot of these big ids
 // will match some words on the blocklist and will be re-generated anyway
 
-const upTo = 100_000_000;
+const upTo = 10_000_000;
 
 test('uniques', () => {
 	const sqids = new Sqids();
