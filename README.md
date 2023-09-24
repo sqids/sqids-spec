@@ -61,16 +61,17 @@ Decoding is the same process but in reverse. A few things worth noting:
 - If two separators are right next to each other within the ID, that's fine - it just means the rest of the ID are junk characters used to satisfy the `minLength` requirement
 - The decoding function does not check if ID is valid/canonical, because we want blocked IDs to still be decodable (the user can check for this stuff themselves by re-encoding decoded numbers)
 
-## 📦 Porting to a new language
+## 📦 How to port Sqids to another language?
 
-Implementations of new languages are more than welcome! To start:
+Implementations of new languages are [more than welcome](https://sqids.org/faq#contribute-lang)! To start:
 
-1. Make sure you have access to the org's repo. The format is `https://github.com/sqids/sqids-[LANGUAGE]`. If you don't have access, ask one of the maintainers to add you; if it doesn't exist, ask [@4kimov](https://github.com/4kimov).
+1. Make sure the language is not already implemented. At this point, if you see a Hashids implementation, but not a Sqids implementation: we could use your help on converting it.
 1. The main spec is here: <https://github.com/sqids/sqids-spec/blob/main/src/index.ts>. It's ~300 lines of code and heavily commented. Comments are there for clarity, they don't have to exist in your own implementation.
-1. Please use the blocklist from <https://github.com/sqids/sqids-blocklist> (copy and paste the output it gives you into your own code). It will contain the most up-to-date list. Do not copy and paste the blocklist from other implementations, as they might not be up-to-date.
+1. Convert that code to a new language **using your own Github account/repo**.
+1. Please use the blocklist from <https://github.com/sqids/sqids-blocklist>. It will contain the most up-to-date list. Do not copy and paste the blocklist from other implementations, as they might not be up-to-date.
 1. Be sure to implement unit tests. We want to make sure all implementations produce the same IDs. Unit tests are here: <https://github.com/sqids/sqids-spec/tree/main/tests>. You **do not need to port tests in the "internal" folder**; they are there to test the algorithm itself.
-1. If you're publishing to a package manager, please add a co-maintainer so more than one person has access.
-1. When done, please let [@4kimov](https://github.com/4kimov) know so we can update the website.
+1. Once the code is done, ping [@4kimov](https://github.com/4kimov) so we can give you access to the official Sqids repo for that particular language. Once you have access, you'll be able to move your code to the Sqids [Github org account](https://github.com/sqids). We'll add you as a maintainer of that repo so you'll have full control over publishing to that repo.
+1. Finally, we'll update the website to include the new language.
 
 ## 📋 Notes
 

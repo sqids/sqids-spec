@@ -297,6 +297,12 @@ export default class Sqids {
 		return false;
 	}
 
+	// this should be the biggest unsigned integer that the language can safely/mathematically support
+	// the spec does not specify the upper integer limit - so it's up to the individual programming languages
+	// examples as of 2023-09-24:
+	// golang: uint64
+	// rust: u128
+	// php: PHP_INT_MAX
 	private maxValue() {
 		return Number.MAX_SAFE_INTEGER;
 	}
