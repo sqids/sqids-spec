@@ -65,13 +65,15 @@ Decoding is the same process but in reverse. A few things worth noting:
 
 Implementations of new languages are [more than welcome](https://sqids.org/faq#contribute-lang)! To start:
 
-1. Make sure the language is not already implemented. At this point, if you see a Hashids implementation, but not a Sqids implementation: we could use your help on converting it.
+1. Make sure the language is not already implemented. At this point, if you see a Hashids implementation, but not a Sqids implementation: _we could use your help on converting it_.
 1. The main spec is here: <https://github.com/sqids/sqids-spec/blob/main/src/index.ts>. It's ~300 lines of code and heavily commented. Comments are there for clarity, they don't have to exist in your own implementation.
-1. Convert that code to a new language **using your own Github account/repo**.
+1. **Fork the repository/language you'd like to implement to your own Github account.** If the repository/language does not exist under the Sqids Github account, [open a new issue](https://github.com/sqids/sqids-spec/issues) under the spec repo so we can create a blank repo first.
+1. Implement the main library + unit tests + Github Actions (if applicable). You **do not need to port tests in the `internal` folder**; they are there to test the algorithm itself.
+1. Add a `README.md` -- you can re-use any of the [existing ones](https://raw.githubusercontent.com/sqids/sqids-javascript/main/README.md).
 1. Please use the blocklist from <https://github.com/sqids/sqids-blocklist>. It will contain the most up-to-date list. Do not copy and paste the blocklist from other implementations, as they might not be up-to-date.
-1. Be sure to implement unit tests. We want to make sure all implementations produce the same IDs. Unit tests are here: <https://github.com/sqids/sqids-spec/tree/main/tests>. You **do not need to port tests in the "internal" folder**; they are there to test the algorithm itself.
-1. Once the code is done, ping [@4kimov](https://github.com/4kimov) so we can give you access to the official Sqids repo for that particular language. Once you have access, you'll be able to move your code to the Sqids [Github org account](https://github.com/sqids). We'll add you as a maintainer of that repo so you'll have full control over publishing to that repo.
-1. Finally, we'll update the website to include the new language.
+1. **Create a pull request, so we can review & merge it.**
+1. If the repo has no active maintainers, we'll invite you to manage it (and maybe even merge your own PR).
+1. Once the library is ready, we'll update the website.
 
 ## 📋 Notes
 
