@@ -100,3 +100,55 @@ test('max encoding attempts', async () => {
 		'Reached max attempts to re-generate the ID'
 	);
 });
+
+// "id" == generated sqids uid; "word" == blocklist word
+test('specific isBlockedId scenarios', async () => {
+	// id or word less than 3 chars should match exactly
+	// normally: [100] -> "86u"
+	let sqids = new Sqids({
+		blocklist: new Set(['hey']) // should *not* regenerate id
+	});
+	expect.soft(sqids.encode([100])).toEqual('86u');
+
+	// id or word less than 3 chars should match exactly
+	// normally: [100] -> "86u"
+	sqids = new Sqids({
+		blocklist: new Set(['86u']) // should regenerate id
+	});
+	expect.soft(sqids.encode([100])).toEqual('sec');
+
+	// id or word less than 3 chars should match exactly
+	// normally: [1_000_000] -> "gMvFo"
+	sqids = new Sqids({
+		blocklist: new Set(['vFo']) // should *not* regenerate id
+	});
+	expect.soft(sqids.encode([1_000_000])).toEqual('gMvFo');
+
+	// word with ints should match id at the beginning
+	// normally: [100, 202, 303, 404] -> "lP3iIcG1HkYs"
+	sqids = new Sqids({
+		blocklist: new Set(['lP3i']) // should regenerate id
+	});
+	expect.soft(sqids.encode([100, 202, 303, 404])).toEqual('oDqljxrokxRt');
+
+	// word with ints should match id at the end
+	// normally: [100, 202, 303, 404] -> "lP3iIcG1HkYs"
+	sqids = new Sqids({
+		blocklist: new Set(['1HkYs']) // should regenerate id
+	});
+	expect.soft(sqids.encode([100, 202, 303, 404])).toEqual('oDqljxrokxRt');
+
+	// word with ints should *not* match id in the middle
+	// normally: [101, 202, 303, 404, 505, 606, 707] -> "862REt0hfxXVdsLG8vGWD"
+	sqids = new Sqids({
+		blocklist: new Set(['0hfxX']) // should *not* regenerate id
+	});
+	expect.soft(sqids.encode([101, 202, 303, 404, 505, 606, 707])).toEqual('862REt0hfxXVdsLG8vGWD');
+
+	// word *without* ints should match id in the middle
+	// normally: [101, 202, 303, 404, 505, 606, 707] -> "862REt0hfxXVdsLG8vGWD"
+	sqids = new Sqids({
+		blocklist: new Set(['hfxX']) // should regenerate id
+	});
+	expect.soft(sqids.encode([101, 202, 303, 404, 505, 606, 707])).toEqual('seu8n1jO9C4KQQDxdOxsK');
+});
